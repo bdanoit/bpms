@@ -1,0 +1,29 @@
+<div class="jumbotron">
+        <h1>Projects</h1>
+        <?if($projects):?>
+        <p>Here's a list of your current projects.</p>
+        <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Started on</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?foreach($projects as $project):?>
+                <tr>
+                  <td><a href="/project/<?=$project->id;?>"><?=$project->name;?></a></td>
+                  <td><?=$project->started_on;?></td>
+                </tr>
+                <?endforeach;?>
+              </tbody>
+            </table>
+          </div>
+        <?else:?>
+        <p>You have no projects.</p>
+        <?endif;?>
+        <p>
+          <a class="btn btn-lg btn-primary" href="/new-project" role="button">Create new project »</a>
+        </p>
+      </div>

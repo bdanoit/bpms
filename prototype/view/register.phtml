@@ -1,0 +1,38 @@
+<div class="jumbotron">
+    <?if($errors):?>
+    <div class="alert alert-danger">
+        <ul>
+            <?foreach($errors as $error):?>
+            <li><?=$error->message;?></li>
+            <?endforeach;?>
+        </ul>
+    </div>
+    <?endif;?>
+    <h1>Register</h1>
+      <form class="form-signin" role="form" action="/register" method="post">
+    <p>
+        Email address
+        <input type="email" name="email" class="form-control" placeholder="Email address" value="<?=$user->email;?>" required autofocus>
+    </p>
+    <p>
+        Password
+        <input type="password" name="password[]" class="form-control" placeholder="Password" required>
+        <input type="password" name="password[]" class="form-control" placeholder="Confirm Password" required>
+        <!--label class="checkbox">
+          <input type="checkbox" value="remember-me"> Remember me
+        </label-->
+    </p>
+    <p>
+        <input type="submit" class="btn btn-lg btn-primary" value="Register">
+        <a class="btn btn-lg btn-primary" href="/" role="button">Cancel</a>
+    </p>
+      </form>
+      <!--form class="form-signin" role="form" action="/register" method="post">
+        <h2 class="form-signin-heading">Register</h2>
+        <input type="name" class="form-control" placeholder="Name" required autofocus>
+        <input type="email" class="form-control" placeholder="Email address" required autofocus>
+        <input type="password" class="form-control" placeholder="Password" required>
+        <input type="confirm_password" class="form-control" placeholder="Confirm Password" required>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+      </form-->
+</div>

@@ -1,0 +1,31 @@
+<div class="jumbotron">
+    <?if($errors):?>
+    <div class="alert alert-danger">
+        <ul>
+            <?foreach($errors as $error):?>
+            <li><?=$error->message;?></li>
+            <?endforeach;?>
+        </ul>
+    </div>
+    <?elseif($success):?>
+    <div class="alert alert-success">
+        <strong>Settings updated.</strong>
+    </div>
+    <?endif;?>
+    <h1>Settings</h1>
+    <form class="form-settings" method="post" action="/settings">
+    <p>
+        <label>Current Password</label>
+        <input type="password" class="form-control" name="password" placeholder="Current Password" value="">
+    </p>
+    <p>
+        <label>New Password</label>
+        <input type="password" class="form-control" name="new_password[]" placeholder="New Password" value="">
+        <input type="password" class="form-control" name="new_password[]" placeholder="Confirm password" value="">
+    </p>
+    <p>
+        <input type="submit" class="btn btn-lg btn-primary" value="Update">
+        <a class="btn btn-lg btn-primary" href="/settings" role="button">Cancel</a>
+    </p>
+    </form>
+</div>

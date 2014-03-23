@@ -1,0 +1,28 @@
+<?if($errors):?>
+<div class="alert alert-danger">
+    <ul>
+        <?foreach($errors as $error):?>
+        <li><?=$error->message;?></li>
+        <?endforeach;?>
+    </ul>
+</div>
+<?endif;?>
+<form role="form" method="post" action="<?=router::URL("/$project->id/add-member", "project");?>">
+    <div class="form-group">
+        <label for="user_email">Email address</label>
+        <input type="email" name="email" class="form-control" value="<?=$data->email;?>" id="user_email" placeholder="Enter email">
+    </div>
+    <div class="form-group">
+        <label>Permissions</label>
+        <?if($permissions) foreach($permissions as $permission):?>
+        <div class="checkbox">
+            <label>
+                <input type="hidden" name="permissions[<?=$permission->id;?>]" value="<?=($permission->id == 1)?1:0;?>">
+                <input name="permissions[<?=$permission->id;?>]" value="1" type="checkbox" <?if($permission->id == 1):?>disabled="true" checked="true"<?endif;?>> <?=$permission->name;?>
+            </label>
+        </div>
+        <?endforeach;?>
+    </div>
+    <input type="submit" class="btn btn-lg btn-primary" value="Add">
+    <a class="btn btn-lg btn-primary" href="<?=router::URL("/$project->id/members", "project");?>" role="button">Cancel</a>
+</form>

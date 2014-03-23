@@ -1,0 +1,28 @@
+        <?if($members):?>
+        <p>Here's a list of the project's current members.</p>
+        <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Permissions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?foreach($members as $member):?>
+                <tr>
+                  <td><a href="<?=router::URL("/{$project->id}/modify-member/{$member->user()->id}", "project");?>"><?=$member->user()->email;?></a></td>
+                  <td>
+                    <?if($member->permissions()) foreach($member->permissions() as $count => $permission):?><?=($count)?', ':'';?><?=$permission->name;?><?endforeach;?>
+                  </td>
+                </tr>
+                <?endforeach;?>
+              </tbody>
+            </table>
+          </div>
+        <?else:?>
+        <p>This project has no members.</p>
+        <?endif;?>
+        <p>
+          <a class="btn btn-lg btn-primary" href="<?=router::URL('/'.$project->id.'/add-member', "project");?>" role="button">Add a member »</a>
+        </p>

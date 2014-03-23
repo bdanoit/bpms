@@ -1,0 +1,21 @@
+<div class="jumbotron">
+    <?if($errors):?>
+    <div class="alert alert-danger">
+        <ul>
+            <?foreach($errors as $error):?>
+            <li><?=$error->message;?></li>
+            <?endforeach;?>
+        </ul>
+    </div>
+    <?endif;?>
+    <h1>New project</h1>
+    <form class="form-settings" method="post" action="/new-project">
+    <p>
+        <input type="text" class="form-control" name="name" placeholder="Project name">
+    </p>
+    <p>
+        <input type="submit" class="btn btn-lg btn-primary" value="Create">
+        <a class="btn btn-lg btn-primary" href="/" role="button">Cancel</a>
+    </p>
+    </form>
+</div>

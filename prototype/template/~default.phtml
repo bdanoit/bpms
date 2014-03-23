@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title><?if(_global()->title):?><?=_global()->title;?> &bull; <?endif;?>Graphic Design Vancouver | Branding | Print &bull; Web Design | Social Media | Reboot Creative</title>
+<meta name="robots" content="index,follow" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="description" content="<?=run()->manager->meta->read()->description;?>" />
+<meta name="keywords" content="<?=run()->manager->meta->read()->keywords;?><?if(_global()->tags):?>, <?=_global()->tags;?><?endif;?>" />
+<meta name="title" content="<?=run()->manager->meta->read()->title;?>" />
+<link rel="SHORTCUT ICON" href="/webapp/favicon.ico" />
+<link rel="stylesheet" type="text/css" charset="utf-8" href="/web/css/style.css" />
+<link rel="stylesheet" type="text/css" charset="utf-8" href="/web/css/elements.css" />
+<link rel="stylesheet" type="text/css" charset="utf-8" href="/web/css/jquery.qtip.min.css" />
+<link rel="stylesheet" type="text/css" charset="utf-8" href="/web/lightbox/css/jquery.lightbox-0.5.css" media="screen" />
+<script type="text/javascript" charset="utf-8" language="Javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script type="text/javascript" charset="utf-8" language="Javascript" src="/web/lightbox/jquery.lightbox-0.5.min.js"></script>
+<script type="text/javascript" charset="utf-8" language="Javascript" src="/web/js/imagesloaded.min.js"></script>
+<script type="text/javascript" charset="utf-8" language="Javascript" src="/web/js/jquery.qtip.min.js"></script>
+<script type="text/javascript" charset="utf-8" language="Javascript" src="/web/js/jcarousel.js"></script>
+<script type="text/javascript" charset="utf-8" language="Javascript" src="/web/js/base.js"></script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-30417833-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+<body>
+<div id="fb-root"></div>
+<script type="text/javascript" charset="utf-8" language="Javascript">
+(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+</script>
+<div class="main">
+
+<div class="header inner">
+	<a href="/" class="logo"><strong>reboot</strong> Creative</a>
+	<a href="<?=router::URL('/ftp-upload', 'default');?>" class="upload">FTP Upload</a>
+</div>
+<div class="splash inner">
+	<?
+		$folder = run()->manager->folder->findBy(array("name"=>"Splash"));
+		if($folder) $images = run()->manager->file->limit(25)->listBy(array("folder_id"=>$folder->id));
+	?>
+	<?if($images)foreach($images as $index => $image):?>
+	<img <?if(!$index):?>class="first" <?endif;?>src="<?=router::URL("/$image->id", 'file');?>" alt="<?=$image->title;?>" />
+	<?endforeach;?>
+	<?/*<img class="first" src="/web/images/splash.jpg" />
+	<img src="/web/images/splash-2.jpg" />
+	<img src="/web/images/splash-3.jpg" />*/?>
+</div>
+<div class="menu inner">
+	<ul>
+		<li class="about"><a <?if(router::Current()->method == "about_us"):?>class="active" <?endif;?>href="/">About Us</a></li>
+		<li class="creative"><a <?if(router::Current()->method == "creative_solutions"):?>class="active" <?endif;?> href="<?=router::URL('/creative-solutions');?>">Creative Solutions</a></li>
+		<li class="print"><a <?if(in_array(router::Current()->method, array("print_solutions"))):?>class="active" <?endif;?> href="<?=router::URL('/print-solutions');?>">Print Solutions</a></li>
+		<li class="contact"><a <?if(router::Current()->method == "contact_us"):?>class="active" <?endif;?> href="<?=router::URL('/contact-us');?>">Contact Us</a></li>
+		<?if(auth::user()):?>
+		<li class="gallery"><a <?if(router::Current()->method == "client_area"):?>class="active" <?endif;?> href="<?=router::URL('/client-area');?>">Client Gallery</a></li>
+		<?else:?>
+		<li class="client"><a <?if(router::Current()->method == "client_login"):?>class="active" <?endif;?> href="<?=router::URL('/client-login');?>">Client Login</a></li>
+		<?endif;?>
+	</ul>
+</div>
+<div class="body inner">
+	<?=$content;?>
+</div>
+<div class="staydown">
+<div class="footer inner">
+	<div class="fb-like" data-href="http://www.facebook.com/pages/Reboot-Creative/220833644643394" data-send="true" data-width="450" data-show-faces="false" data-font="segoe ui"></div>
+	<a class="terms" href="<?=router::URL('/privacy-policy');?>">Terms and Conditions</a>
+	<p>Copyright &copy; Reboot Creative Inc. All Rights Reserved.</p>
+	<ul class="nav">
+		<li class="one">&bull; <a href="/">About Us</a></li>
+		<li class="two">&bull; <a href="<?=router::URL('/creative-solutions');?>">Creative Solutions</a></li>
+		<li class="three">&bull; <a href="<?=router::URL('/creative-solutions');?>">View Design Portfolio</a></li>
+		<li class="four">&bull; <a href="<?=router::URL('/ftp-upload');?>">FTP Upload</a></li>
+		<li class="one">&bull; <a href="<?=router::URL('/contact-us');?>">Contact Us</a></li>
+		<li class="two">&bull; <a href="<?=router::URL('/print-solutions');?>">Print Solutions</a></li>
+		<li class="three">&bull; <a href="<?=router::URL('/request-a-quote');?>">Request a Quote</a></li>
+		<li class="four">&bull; <a href="<?=router::URL('/client-login');?>">Client Login</a></li>
+	</ul>
+</div>
+</div>
+
+</div>
+</body>
+</html>
