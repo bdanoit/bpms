@@ -25,7 +25,7 @@
     </div>
     <input type="submit" class="btn btn-lg btn-primary" value="Update">
     <a class="btn btn-lg btn-primary" href="<?=router::URL("/{$project->id}/members", "project");?>" role="button">Cancel</a>
-    <?if(auth::check(auth::EDIT)):?>
+    <?if(auth::check("remove_member")):?>
     <a class="btn btn-lg btn-primary" href="<?=router::URL("/{$project->id}/remove-member/{$vars->user()->id}", "project");?>" role="button" onclick="javascript:return confirm('Are you sure you want to remove <?=$vars->user()->email;?>?');">Remove Member</a>
     <?endif;?>
 </form>

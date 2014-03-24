@@ -9,7 +9,7 @@
     <meta name="author" content="">
     <!--link rel="shortcut icon" href="../../assets/ico/favicon.ico"-->
 
-    <title><?if(_global()->title):?><?=_global()->title;?> &middot; <?endif;?>BPMS</title>
+    <title><?if($global->title):?><?=$global->title;?> &middot; <?endif;?>BPMS</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/web/css/bootstrap.min.css" rel="stylesheet">
@@ -39,9 +39,9 @@
           </button>
           <a class="navbar-brand" href="/">BPMS</a>
         </div>
-        <?if(auth::user()):?>
+        <?if($user):?>
         <div class="navbar-collapse collapse">
-          <?if(auth::user()):?><p class="navbar-text"><small>(<?=auth::user()->email;?>)</small></p><?endif;?>
+          <?if($user):?><p class="navbar-text"><small>(<?=$user->email;?>)</small></p><?endif;?>
           <ul class="nav navbar-nav navbar-right">
             <li><a href="/new-project">New project</a></li>
             <li><a href="/projects">Projects</a></li>

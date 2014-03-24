@@ -101,4 +101,11 @@ class SQLResultObject{
 	}
 }
 
-class SQLException extends Exception{}
+class SQLException extends Exception{
+    public final function message(){
+        return $this->message;
+    }
+    public final function errno(){
+        return $this->errno;
+    }
+}

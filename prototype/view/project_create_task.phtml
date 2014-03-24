@@ -1,0 +1,33 @@
+<?if($errors):?>
+<div class="alert alert-danger">
+    <ul>
+        <?foreach($errors as $error):?>
+        <li><?=$error->message;?></li>
+        <?endforeach;?>
+    </ul>
+</div>
+<?endif;?>
+<form role="form" method="post">
+  <div class="form-group">
+    <label for="task_name">Name</label>
+    <input name="name" type="email" class="form-control" id="task_name" placeholder="Name">
+  </div>
+    <fieldset>          
+        <div class="control-group">
+        <label for="task_assigned_to">Assigned to</label>
+            <div class="controls">
+                <select name="assigned_to[]" id="task_assigned_to" size="4" multiple data-placeholder="Choose member(s)...">
+                    <?foreach($members as $user):?>
+                    <option value="<?=$user->id;?>"><?=$user->email;?></option>
+                    <?endforeach;?>
+                </select>
+            </div>
+        </div>
+    </fieldset>
+  <div class="form-group">
+    <label for="task_description">Description</label>
+    <textarea name="description" id="task_description" class="form-control" placeholder="Description" rows="3"></textarea>
+  </div>
+    <input type="submit" class="btn btn-lg btn-primary" value="Create">
+    <a class="btn btn-lg btn-primary" href="<?=router::URL("/$project->id", "project");?>" role="button">Cancel</a>
+</form>

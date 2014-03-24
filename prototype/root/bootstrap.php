@@ -89,5 +89,8 @@ else $content = call_user_func_array(array(run()->controller()->$controller(), $
  */
 print template()->{$info->template}(array(
 	"content"=>$content,
-    "vars"=>router::Current()->vars
+    "vars"=>router::Current()->vars,
+    "route"=>router::Current(),
+    "user"=>auth::user(),
+    "global"=>_global()
 ));

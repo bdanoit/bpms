@@ -88,3 +88,33 @@ FOR EACH ROW
         SET NEW.password = IF(NEW.password = OLD.password, NEW.password, md5(NEW.password));
 END$$
 DELIMITER ;
+
+
+
+
+DELIMITER $$
+DROP TRIGGER IF EXISTS `project_creator_permissions_insert`$$
+CREATE TRIGGER `project_creator_permissions_insert`
+    AFTER INSERT ON `project`
+FOR EACH ROW
+    BEGIN
+        INSERT INTO project_permission (project_id, user_id, permission_id) SELECT NEW.id AS project_id, NEW.creator_id AS user_id, id AS permission_id FROM permission;
+END$$
+DELIMITER ;
+
+/*
+DELIMITER $$
+DROP TRIGGER IF EXISTS `project_creator_permissions_delete`$$
+CREATE TRIGGER `project_creator_permissions_delete`
+    BEFORE DELETE ON `project_permission`
+FOR EACH ROW
+    BEGIN
+        DECLARE msg VARCHAR(255);
+        DECLARE creator_id CURSOR FOR SELECT creator_id FROM project WHERE id = OLD.project_id;
+        
+        IF(creator_id = OLD.user_id) THEN
+            SET msg = 'DELETE canceled, project owner permissions cannot be revoked.';
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg; 
+        END IF;
+END$$
+DELIMITER ;*/

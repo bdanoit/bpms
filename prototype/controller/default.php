@@ -14,21 +14,22 @@ class ControllerDefault extends Controller
             if(run()->manager->user->tryLogin($_POST)){
                 util::Redirect(router::URL('/projects'));
             }
-            $login = (object)$_POST;
+            $user = (object)$_POST;
         }
 		if(auth::user()) return view()->welcome(array(
 		    "user"=>auth::user()
 		));
 		else return view()->login(array(
-		    "login"=>$login
+		    "user"=>$user
 		));
     }
     
     public function register(){
         _global()->title = "Register";
         if($_POST){
+            $data = (object)$_POST;
             if(run()->manager->user->insert($_POST)){
-                if(run()->manager->user->tryLogin($_POST)){
+                if(run()->manager->user->tryLogin(array("email"=>$data->email,"password"=>$data->password[0]))){
                     util::Redirect(router::URL('/projects'));
                 }
             }
@@ -43,10 +44,8 @@ class ControllerDefault extends Controller
     }
     
     public function projects(){
-        _global()->title = "My Projects";
-        $projects = run()->manager->project->listBy(array(
-            "creator_id"=>auth::user()->id
-        ));
+        _global()->title = "Projects";
+        $projects = run()->manager->project->listByUser(auth::user()->id);
 		return view()->projects(array(
 		    "user"=>auth::user(),
             "projects"=>$projects
@@ -88,4 +87,9 @@ class ControllerDefault extends Controller
 		auth::logout();
 		util::Redirect(router::URL('/'));
 	}
+    
+    public function forbidden(){
+        _global()->title = "403 Forbidden";
+        return view()->forbidden();
+    }
 }

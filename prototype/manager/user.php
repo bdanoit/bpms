@@ -11,6 +11,23 @@ class ManagerUser extends Manager{
 			"email"=>"ASC"
 		);
 	}
+    
+    public final function listByProject($id, $prepare = true){
+        $SQL = <<<SQL
+SELECT * FROM
+    {$this->database()}.{$this->table()}
+WHERE
+    id IN (SELECT user_id FROM {$this->database()}.project_permission WHERE project_id = $id GROUP BY user_id);
+SQL;
+        $results = self::query_rows($SQL);
+        if(!$results || !$prepare) return $result;
+        foreach($results as $result){
+            $result->project_id = $id;
+            $result->permissions = function($row){ return run()->manager->permission->listByProjectMember($row->project_id, $row->id); };
+			$this->prepare($result);
+		}
+        return $results;
+    }
 	
 	public final function checkPassword($user_id, $password){
 		if(!$password) return false;

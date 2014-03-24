@@ -29,7 +29,7 @@ class ControllerProject extends Controller
     public function members($project_id, $action){
         _global()->title = "Members";
         _global()->breadcrumb[_global()->title] = $action;
-        $members = run()->manager->projectPermission->listBy(array("project_id"=>$project_id,"permission_id"=>1));
+        $members = run()->manager->user->listByProject($project_id);
         return view()->project_members(array(
 		    "project"=>$this->project,
             "members"=>$members
@@ -39,7 +39,24 @@ class ControllerProject extends Controller
     public function create_task($project_id, $action){
         _global()->title = "Create task";
         _global()->breadcrumb[_global()->title] = $action;
+        if($_POST){
+        }
         return view()->project_create_task(array(
+		    "project"=>$this->project,
+            "members"=>run()->manager->user->listByProject($project_id)
+		));
+    }
+    
+    public function add_milestone($project_id, $action){
+        _global()->title = "Add a milestone";
+        _global()->breadcrumb[_global()->title] = $action;
+        if($_POST){
+            $data = (object)$_POST;
+            if(run()->manager->projectPermission->insert($this->project->id, $data->email, $data->permissions))
+                util::Redirect(router::URL("/$project_id/members"));
+        }
+        return view()->project_add_milestone(array(
+            "data"=>$data,
 		    "project"=>$this->project
 		));
     }
@@ -85,9 +102,7 @@ class ControllerProject extends Controller
     }
     
     public function forbidden(){
-        _global()->title = "403 Forbidden";
-        _global()->breadcrumb[_global()->title] = router::Current()->action;
-        return view()->project_forbidden();
+        util::Redirect(router::URL("/forbidden", "default"));
     }
     
     public function remove_member($project_id, $action, $user_id){
