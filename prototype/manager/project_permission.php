@@ -12,24 +12,24 @@ class ManagerProjectPermission extends Manager{
 		);
 	}
     
-    public final function insert($project_id, $user_email, array $permissions){
-        return self::update($project_id, $user_email, $permissions, true);
+    public final function insert($project_id, $user_name, array $permissions){
+        return self::update($project_id, $user_name, $permissions, true);
     }
     
-    public final function update($project_id, $user_email, array $permissions, $insert = false){
-        $user = run()->manager->user->findBy(array("email"=>$user_email));
+    public final function update($project_id, $user_name, array $permissions, $insert = false){
+        $user = run()->manager->user->findBy(array("name"=>$user_name));
         $project = run()->manager->project->findBy(array("id"=>$project_id));
         if($insert && $this->findBy(array("user_id"=>$user->id,"project_id"=>$project_id))){
 			$GLOBALS["errors"][] = (object)array(
 				"code"=>dechex(0),
-				"message"=>"User ($user_email) is already a member of this project."
+				"message"=>"User ($user_name) is already a member of this project."
 			);
             return false;
         }
         if(!$user){
 			$GLOBALS["errors"][] = (object)array(
 				"code"=>dechex(0),
-				"message"=>"User ($user_email) does not exist."
+				"message"=>"User ($user_name) does not exist."
 			);
             return false;
         }
@@ -67,6 +67,21 @@ class ManagerProjectPermission extends Manager{
             }
         }
         return true;
+    }
+    
+    public final function deleteByProjectUser($project_id, $user_id){
+        $project = run()->manager->project->findBy(array("id"=>$project_id));
+        if($project->creator_id == $user_id){
+            $GLOBALS["errors"][] = (object)array(
+                "code"=>dechex(0),
+                "message"=>"DELETE canceled, project owner permissions cannot be revoked."
+            );
+            return false;
+        }
+        return parent::deleteBy(array(
+            "project_id"=>$project_id,
+            "user_id"=>$user_id
+        ));
     }
     
 	protected final function prepare(&$row){

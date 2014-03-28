@@ -11,8 +11,12 @@
     <h1>Register</h1>
       <form class="form-signin" role="form" action="/register" method="post">
     <p>
+        Username
+        <input type="text" name="name" class="form-control" placeholder="Username" value="<?=$user->name;?>" required autofocus>
+    </p>
+    <p>
         Email address
-        <input type="email" name="email" class="form-control" placeholder="Email address" value="<?=$user->email;?>" required autofocus>
+        <input type="email" name="email" class="form-control" placeholder="Email address" value="<?=$user->email;?>" required>
     </p>
     <p>
         Password

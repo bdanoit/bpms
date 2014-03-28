@@ -95,3 +95,12 @@ body {
   display: inline-block;
   border-radius: 50%;
 }
+
+/*
+.table>tbody>tr.active>td{
+    color: #fff;
+    background-color: #428bca;
+}
+.table>tbody>tr.active>td a{
+    color: #fff;
+}*/

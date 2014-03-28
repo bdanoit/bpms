@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS task_assigned_to;
-DROP TABLE IF EXISTS task_permission;
+/*DROP TABLE IF EXISTS task_permission;*/
 DROP TABLE IF EXISTS project_permission;
 DROP TABLE IF EXISTS permission;
 DROP TABLE IF EXISTS task;
@@ -9,36 +9,37 @@ DROP TABLE IF EXISTS user;
 
 CREATE TABLE user(
     id int primary key auto_increment,
+    name char(32) unique not null,
     password char(32) not null,
-    email char(128) not null
+    email char(128) unique not null
 )ENGINE=InnoDB CHARACTER SET=utf8;
 
 CREATE TABLE project(
     id int primary key auto_increment,
     name char(64) not null,
     creator_id int references user(id),
-    created date
+    created datetime
 )ENGINE=InnoDB CHARACTER SET=utf8;
 
 CREATE TABLE phase(
     id int primary key auto_increment,
-    project_id int references project(id),
+    project_id int not null references project(id) ON DELETE CASCADE,
     name char(64) not null,
     description text,
-    start date not null,
-    end date not null,
+    start datetime not null,
+    end datetime not null,
     creator_id int references user(id)
 )ENGINE=InnoDB CHARACTER SET=utf8;
 
 CREATE TABLE task(
     id int primary key auto_increment,
-    project_id int references project(id),
-    phase_id int references phase(id),
+    project_id int not null references project(id) ON DELETE CASCADE,
     name char(64) not null,
     description text,
-    start date not null,
-    end date not null,
-    creator_id int references user(id)
+    start datetime not null,
+    end datetime not null,
+    creator_id int references user(id),
+    complete tinyint(1) not null default 0
 )ENGINE=InnoDB CHARACTER SET=utf8;
 
 CREATE TABLE permission(
@@ -47,23 +48,24 @@ CREATE TABLE permission(
 )ENGINE=InnoDB CHARACTER SET=utf8;
 
 CREATE TABLE project_permission(
-    project_id int references project(id),
-    user_id int references user(id),
+    project_id int references project(id) ON DELETE CASCADE,
+    user_id int references user(id) ON DELETE CASCADE,
     permission_id int references permission(id),
     UNIQUE(project_id,user_id,permission_id)
 )ENGINE=InnoDB CHARACTER SET=utf8;
 
-CREATE TABLE task_permission(
+/*CREATE TABLE task_permission(
     project_id int references project(id),
-    task_id int references project(id),
+    task_id int references task(id),
     user_id int references user(id),
     permission_id int references permission(id)
-)ENGINE=InnoDB CHARACTER SET=utf8;
+)ENGINE=InnoDB CHARACTER SET=utf8;*/
 
 CREATE TABLE task_assigned_to(
     project_id int references project(id),
-    task_id int references project(id),
-    user_id int references user(id)
+    task_id int references task(id) ON DELETE CASCADE,
+    user_id int references user(id) ON DELETE CASCADE,
+    unique key(project_id, task_id, user_id)
 )ENGINE=InnoDB CHARACTER SET=utf8;
 
 

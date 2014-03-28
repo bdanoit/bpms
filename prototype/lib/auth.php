@@ -4,6 +4,7 @@ class auth{
 	const MEMBER = 1;
 	const EDIT = 2;
 	const DELETE = 4;
+	const GRANT = 8;
 	
 	private static $require;
 	private static $requireAll;

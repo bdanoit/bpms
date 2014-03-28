@@ -30,6 +30,7 @@ SQL;
 	protected final function prepare(&$row){
 		$row->started_on = date('F d, Y', strtotime($row->created));
         $row->name = strtoupper($row->name);
+        $row->user = function($row){ return run()->manager->user->findBy(array("id"=>$row->creator_id)); };
 	}
 	
 	protected function validation(){

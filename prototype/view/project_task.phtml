@@ -1,0 +1,88 @@
+<?if($errors):?>
+<div class="alert alert-danger">
+    <ul>
+        <?foreach($errors as $error):?>
+        <li><?=$error->message;?></li>
+        <?endforeach;?>
+    </ul>
+</div>
+<?endif;?>
+<?if($task):?>
+<div class="col-sm-4">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Log</h3>
+        </div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>When</th>
+                        <th>Amount</th>
+                        <th>By</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Test</td>
+                        <td>Test</td>
+                        <td>Test</td>
+                    </tr>
+                    <tr>
+                        <td>Test</td>
+                        <td>Test</td>
+                        <td>Test</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-sm-4">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Collaborators</h3>
+        </div>
+        <div class="panel-body">
+    <?if($task->assigned_to()):?>
+    <div class="list-group">
+        <?foreach($task->assigned_to() as $user):?>
+        <a href="<?=router::URL("/{$project->id}/member/{$user->id}", "project");?>" class="list-group-item<?if($user->id == auth::user()->id):?> active<?endif;?>"><?=$user->name;?></a>
+        <?endforeach;?>
+    </div>
+    <?endif;?>
+        </div>
+    </div>
+</div>
+<div class="col-sm-4">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Add time</h3>
+        </div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <form>
+                     <div class="form-group">
+                        <label for="start_date" class="col-sm-3">When</label>
+                        <input type="date" name="start_date" id="start_date" value="<?=$log->start_date;?>" required>
+                        <input type="time" name="start_time" id="task_start_time" value="<?=$log->start_time;?>" required>
+                    </div>
+                     <div class="form-group">
+                        <label for="hours" class="col-sm-3">Hours</label>
+                        <input type="number" name="hours" id="hours" value="<?=$log->start_date;?>" placeholder="hours" required>
+                    </div>
+                     <div class="form-group">
+                        <label for="minutes" class="col-sm-3">Minutes</label>
+                        <input type="number" name="minutes" id="minutes" value="<?=$log->start_time;?>" placeholder="minutes" required>
+                    </div>
+                    <input type="submit" class="btn btn-lg btn-default btn-block" value="Add">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<?else:?>
+<p>Task not found.</p>
+<?endif;?>

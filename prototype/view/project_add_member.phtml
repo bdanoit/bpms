@@ -9,8 +9,8 @@
 <?endif;?>
 <form role="form" method="post" action="<?=router::URL("/$project->id/add-member", "project");?>">
     <div class="form-group">
-        <label for="user_email">Email address</label>
-        <input type="email" name="email" class="form-control" value="<?=$data->email;?>" id="user_email" placeholder="Enter email">
+        <label for="user_name">Username</label>
+        <input type="text" name="name" class="form-control" value="<?=$data->name;?>" id="user_name" placeholder="Username">
     </div>
     <div class="form-group">
         <label>Permissions</label>

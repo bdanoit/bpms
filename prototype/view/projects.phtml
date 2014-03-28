@@ -7,6 +7,7 @@
               <thead>
                 <tr>
                   <th>Name</th>
+                  <th>Created by</th>
                   <th>Started on</th>
                 </tr>
               </thead>
@@ -14,6 +15,7 @@
                 <?foreach($projects as $project):?>
                 <tr>
                   <td><a href="/project/<?=$project->id;?>"><?=$project->name;?></a></td>
+                  <td><?=$project->user()->alias;?></td>
                   <td><?=$project->started_on;?></td>
                 </tr>
                 <?endforeach;?>

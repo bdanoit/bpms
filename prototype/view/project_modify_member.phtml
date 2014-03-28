@@ -7,10 +7,10 @@
     </ul>
 </div>
 <?endif;?>
-<h2><?=$vars->user()->email;?></h2>
+<h2><?=$vars->user()->alias;?></h2>
 <form role="form" method="post" action="<?=router::URL("/$project->id/modify-member/{$vars->user()->id}", "project");?>">
     <div class="form-group">
-        <input type="hidden" name="email" value="<?=$vars->user()->email;?>">
+        <input type="hidden" name="name" value="<?=$vars->user()->name;?>">
     </div>
     <div class="form-group">
         <label>Permissions</label>
@@ -26,6 +26,6 @@
     <input type="submit" class="btn btn-lg btn-primary" value="Update">
     <a class="btn btn-lg btn-primary" href="<?=router::URL("/{$project->id}/members", "project");?>" role="button">Cancel</a>
     <?if(auth::check("remove_member")):?>
-    <a class="btn btn-lg btn-primary" href="<?=router::URL("/{$project->id}/remove-member/{$vars->user()->id}", "project");?>" role="button" onclick="javascript:return confirm('Are you sure you want to remove <?=$vars->user()->email;?>?');">Remove Member</a>
+    <a class="btn btn-lg btn-primary" href="<?=router::URL("/{$project->id}/remove-member/{$vars->user()->id}", "project");?>" role="button" onclick="javascript:return confirm('Are you sure you want to remove <?=$vars->user()->alias;?>?');">Remove Member</a>
     <?endif;?>
 </form>

@@ -10,24 +10,34 @@
 <form role="form" method="post">
   <div class="form-group">
     <label for="task_name">Name</label>
-    <input name="name" type="email" class="form-control" id="task_name" placeholder="Name">
+    <input name="name" type="text" class="form-control" id="task_name" placeholder="Name" value="<?=$task->name;?>">
   </div>
+  <div class="form-group">
     <fieldset>          
         <div class="control-group">
-        <label for="task_assigned_to">Assigned to</label>
+        <label for="task_assigned_to">Assign to</label>
             <div class="controls">
                 <select name="assigned_to[]" id="task_assigned_to" size="4" multiple data-placeholder="Choose member(s)...">
                     <?foreach($members as $user):?>
-                    <option value="<?=$user->id;?>"><?=$user->email;?></option>
+                    <option value="<?=$user->id;?>"<?if(in_array($user->id, $task->assigned_to)):?> selected<?endif;?>><?=$user->alias;?></option>
                     <?endforeach;?>
                 </select>
             </div>
         </div>
     </fieldset>
+  </div>
+  <div class="form-group">
+    <label for="task_start_date">Starts</label>
+    <input type="date" name="start_date" id="task_start_date" value="<?=$task->start_date;?>">
+    <input type="time" name="start_time" id="task_start_time" value="<?=$task->start_time;?>">
+    <label for="task_start_date">Ends</label>
+    <input type="date" name="end_date" id="task_start_date" value="<?=$task->end_date;?>">
+    <input type="time" name="end_time" id="task_start_time" value="<?=$task->end_time;?>">
+  </div>
   <div class="form-group">
     <label for="task_description">Description</label>
-    <textarea name="description" id="task_description" class="form-control" placeholder="Description" rows="3"></textarea>
+    <textarea name="description" id="task_description" class="form-control" placeholder="Description" rows="5"><?=$task->description;?></textarea>
   </div>
-    <input type="submit" class="btn btn-lg btn-primary" value="Create">
+    <input type="submit" class="btn btn-lg btn-primary" value="<?=$submit_name;?>">
     <a class="btn btn-lg btn-primary" href="<?=router::URL("/$project->id", "project");?>" role="button">Cancel</a>
 </form>

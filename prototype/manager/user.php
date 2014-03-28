@@ -80,11 +80,18 @@ SQL;
 			);
 			return;
 		}
-		$user = $this->findBy(array("email"=>$params["email"]));
-		if($user){
+		
+		if($user = $this->findBy(array("email"=>$params["email"]))){
 			$GLOBALS["errors"][] = (object)array(
 				"code"=>dechex(0),
 				"message"=>"A user with that email already exists"
+			);
+			return;
+		}
+		if($user = $this->findBy(array("name"=>$params["name"]))){
+			$GLOBALS["errors"][] = (object)array(
+				"code"=>dechex(0),
+				"message"=>"A user with that name already exists"
 			);
 			return;
 		}
@@ -133,14 +140,13 @@ SQL;
 	
 	protected final function prepare(&$row){
 		//$row->full_name = "$row->first_name $row->last_name";
+		$row->alias = $row->name ? $row->name : $row->email;
 	}
 	
 	protected function validation(){
 		return array(
-			"first_name"=>
-				formAuth::Required,
-			"last_name"=>
-				formAuth::Required,
+			"name"=>
+				formAuth::Required | formAuth::Password,
 			"email"=>
 				formAuth::Required |
 				formAuth::Email,

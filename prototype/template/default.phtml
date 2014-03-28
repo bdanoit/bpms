@@ -41,7 +41,7 @@
         </div>
         <?if($user):?>
         <div class="navbar-collapse collapse">
-          <?if($user):?><p class="navbar-text"><small>(<?=$user->email;?>)</small></p><?endif;?>
+          <?if($user):?><p class="navbar-text"><small>(<?=$user->alias;?>)</small></p><?endif;?>
           <ul class="nav navbar-nav navbar-right">
             <li><a href="/new-project">New project</a></li>
             <li><a href="/projects">Projects</a></li>
