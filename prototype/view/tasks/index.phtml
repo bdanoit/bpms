@@ -1,0 +1,44 @@
+<?if($errors):?>
+<div class="alert alert-danger">
+    <ul>
+        <?foreach($errors as $error):?>
+        <li><?=$error->message;?></li>
+        <?endforeach;?>
+    </ul>
+</div>
+<?endif;?>
+<?if($tasks):?>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Due</th>
+                <?if(auth::check("edit_task")):?>
+                <th>Tools</th>
+                <?endif;?>
+            </tr>
+            </thead>
+            <tbody>
+                <?foreach($tasks as $task):?>
+                <tr class="<?if($task->complete):?>success<?elseif($task->is_late):?>danger<?elseif($task->is_due_soon):?>warning<?endif;?>">
+                    <td><a href="<?=router::URL("/*id/tasks/view/$task->id");?>"><?=$task->name;?></a></td>
+                    <td><?=$task->end_pretty;?></td>
+                    <?if(auth::check("edit_task")):?>
+                    <td>
+                        <a class="btn btn-default btn-xs align-right" href="<?=router::URL("/*id/tasks/edit/$task->id");?>">Edit</a>
+                        <?if($task->complete):?>
+                        <a class="btn btn-success btn-xs align-right" href="<?=router::URL("/*id/tasks/task-incomplete/$task->id");?>">Finished</a>
+                        <?else:?>
+                        <a class="btn btn-warning btn-xs align-right" href="<?=router::URL("/*id/tasks/task-complete/$task->id");?>">Not finished</a>
+                        <?endif;?>
+                    </td>
+                    <?endif;?>
+                </tr>
+                <?endforeach;?>
+            </tbody>
+        </table>
+    </div>
+<?else:?>
+    <p><?=$message;?></p>
+<?endif;?>

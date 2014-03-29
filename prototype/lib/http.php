@@ -11,6 +11,10 @@ class http{
 	public static function uri(){
 		return self::path().vars::get();
 	}
+    
+    public static function last(){
+		return parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH);
+    }
 }
 class vars{
 	private static $obj;

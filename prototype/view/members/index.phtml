@@ -5,8 +5,10 @@
               <thead>
                 <tr>
                   <th>Alias</th>
+                  <?if(auth::check("modify_member")):?>
                   <th>Tools</th>
                   <th>Permissions</th>
+                  <?endif;?>
                 </tr>
               </thead>
               <tbody>
@@ -17,7 +19,7 @@
                         <strong><?=$user->alias;?></strong> <small>creator</small>
                         <?else:?>
                             <?if(auth::check("modify_member")):?>
-                            <a href="<?=router::URL("/{$project->id}/modify-member/{$user->id}", "project");?>"><?=$user->alias;?></a>
+                            <a href="<?=router::URL("/*id/members/modify/{$user->id}");?>"><?=$user->alias;?></a>
                             <?else:?>
                             <?=$user->alias;?>
                             <?endif;?>
@@ -25,9 +27,9 @@
                     </td>
                     <?if(auth::check("modify_member")):?>
                     <td>
-                        <a href="<?=router::URL("/{$project->id}/modify-member/{$user->id}", "project");?>" class="btn btn-xs btn-default">Edit</a>
+                        <a href="<?=router::URL("/*id/members/modify/{$user->id}");?>" class="btn btn-xs btn-default">Edit</a>
                         <?if(auth::check("remove_member")):?>
-                        <a href="<?=router::URL("/{$project->id}/remove-member/{$user->id}", "project");?>" class="btn btn-xs btn-default" onclick="javascript:return confirm('Are you sure you want to remove <?=$user->alias;?>?');">Remove</a>
+                        <a href="<?=router::URL("/*id/members/remove/{$user->id}");?>" class="btn btn-xs btn-default" onclick="javascript:return confirm('Are you sure you want to remove <?=$user->alias;?>?');">Remove</a>
                         <?endif;?>
                     </td>
                     <td>
@@ -46,6 +48,6 @@
         <?endif;?>
         <p>
             <?if(auth::check("add_member")):?>
-            <a class="btn btn-lg btn-primary" href="<?=router::URL('/'.$project->id.'/add-member', "project");?>" role="button">Add a member »</a>
+            <a class="btn btn-lg btn-primary" href="<?=router::URL('/*id/members/add');?>" role="button">Add a member »</a>
             <?endif;?>
         </p>

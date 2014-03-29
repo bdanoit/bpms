@@ -37,10 +37,22 @@ class router{
 		if($controller){
 			$base = self::findBase($controller);
 			if($base === false){
-				throw new RouterException("Could not find route for controller: $controller");
+				throw new RouterException("Could not find route for controller ($controller)");
 			}
 		}
 		else $base = self::Current()->base;
+        $vars = router::Current()->vars;
+        $path = preg_replace_callback(
+            '#\*([^/]+)#',
+            function($matches) use ($vars){
+                $match = $matches[1];
+                if(!$value = $vars->$match){
+                    throw new RouterException("Could not find variable ($match) in controller ($controller)");
+                }
+                return $vars->$match;
+            },
+            $path
+        );
 		if(!$path) return $base;
 		else return $base.$path;
 	}
@@ -57,7 +69,7 @@ class router{
 			preg_match_all($var_regex, $pattern, $keys);
 			$new_pattern = preg_replace($var_regex, '(?:/([^/]+))?', $pattern);
 			if(preg_match("#^$new_pattern(?:/[^/]*)*?$#", $uri, $match)){
-				$base = preg_replace($var_regex, "", $pattern);
+				$base = preg_replace('#/\$.+$#', "", $pattern);
 				break;
 			}
 		}
@@ -76,7 +88,6 @@ class router{
 		// Take action out of base
 		if($method)
 			$base = preg_replace('#(?<=.)/'.$method.'$#', "", $base);
-		
 		self::$current_route = array(
 			"controller"=>$info["controller"],
 			"path"=>$info["path"],
@@ -108,11 +119,12 @@ class router{
 	}
 	
 	public static function Params(){
-		$base = self::Current()->base;
-		$action = self::Current()->action;
-		$path = preg_replace("#^$base/($action/?)?#", "", http::path());
-		if(!$path) return array();
-		return explode('/', $path);
+        if(!self::Current()->vars) return array();
+        $arr = array();
+        foreach(self::Current()->vars as $key => $value){
+            $arr[] = $value;
+        }
+        return $arr;
 	}
 }
 class RouterException extends Exception{

@@ -16,7 +16,13 @@ class auth{
 		self::$user = run()->manager->user->findByHash(cookie()->user->value());
         #begin hack
         $route = router::Current();
-        if($route->controller == "project" && $route->vars->id){
+        $areas = array(
+            "project",
+            "tasks",
+            "members",
+            "milestones"
+        );
+        if(in_array($route->controller, $areas) && $route->vars->id){
             $permissions = run()->manager->permission->listByProjectMember($route->vars->id, self::$user->id);
             if($permissions) foreach($permissions as $permission){
                 self::$user->auth_level = self::$user->auth_level | pow(2,($permission->id-1));

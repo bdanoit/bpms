@@ -8,14 +8,15 @@
     <meta name="author" content="">
     <link rel="shortcut icon" href="/web/ico/favicon.ico">
 
-    <title><?if($global->title):?><?=$global->title;?> - <?endif;?><?if($global->project->name):?><?=$global->project->name;?> &middot; <?endif;?>BPMS</title>
+    <title><?if($global->title):?><?=$global->title;?> &middot; <?endif;?>BPMS</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/web/css/bootstrap.min.css" rel="stylesheet">
     <link href="/web/css/multi-select.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="/web/css/dashboard.css" rel="stylesheet">
+    <link href="/web/css/default.css" rel="stylesheet">
+    <!--link href="/web/css/dashboard.css" rel="stylesheet"-->
 
     <!-- Just for debugging purposes. Don't actually copy this line! -->
     <!--[if lt IE 9]><script src="/web/js/ie8-responsive-file-warning.js"></script><![endif]-->
@@ -28,64 +29,27 @@
   </head>
 
   <body>
-
-    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="<?=router::URL('/'.$global->project->id);?>"><?=$global->project->name;?></a>
+    <?=view()->nav->main(array('user'=>$user,"vars"=>$vars,"route"=>$route,"global"=>$global));?>
+    <div class="container dashboard">
+        <h1><?=$global->project->name;?></h1>
+        <?=view()->nav->project(array('user'=>$user,"vars"=>$vars,"route"=>$route,"global"=>$global));?>
+        <div class="bpms-panel">
+                <?/*<?if($global->breadcrumb):?>
+                <ol class="breadcrumb">
+                    <?foreach($global->breadcrumb as $name => $action):?>
+                        <?if($action == $route->action):?>
+                        <li><?=$name;?></li>
+                        <?else:?>
+                        <li><a href="<?=router::URL("/".$global->project->id.($action?"/$action":''));?>"><?=$name;?></a></li>
+                        <?endif;?>
+                    <?endforeach;?>
+                </ol>
+                <?endif;?>*/?>
+            <div class="bpms-panel-body">
+                <h3 class="page-header"><?=$global->title;?></h3>
+                <div class="row"><?=$content;?></div>
+            </div>
         </div>
-        <div class="navbar-collapse collapse">
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="/">BPMS</a></li>
-            <li><a href="/projects">Projects</a></li>
-            <li><a href="/logout">Logout</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
-            <ul class="nav nav-sidebar">
-                <li<?if(!$vars->action):?> class="active"<?endif;?>><a href="/project/<?=$global->project->id;?>">Overview</a></li>
-                <li<?if($vars->action=="my_tasks"):?> class="active"<?endif;?>><a href="/project/<?=$global->project->id;?>/my-tasks">My tasks</a></li>
-                <li<?if($vars->action=="members"):?> class="active"<?endif;?>><a href="/project/<?=$global->project->id;?>/members">Members</a></li>
-                <?if(auth::check("add_member")):?>
-                <li<?if($vars->action=="add-member"):?> class="active"<?endif;?>><a href="/project/<?=$global->project->id;?>/add-member">Add a member</a></li>
-                <?endif;?>
-            </ul>
-            <ul class="nav nav-sidebar">
-                <?/*if(auth::check("add_milestone")):?>
-                <li<?if($vars->action=="add-milestone"):?> class="active"<?endif;?>><a href="/project/<?=$global->project->id;?>/add-milestone">Add a milestone</a></li>
-                <?endif;*/?>
-                <?if(auth::check("create_task")):?>
-                <li<?if($vars->action=="create-task"):?> class="active"<?endif;?>><a href="/project/<?=$global->project->id;?>/create-task">Create task</a></li>
-                <?endif;?>
-            </ul>
-        </div>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-            <?if($global->breadcrumb):?>
-            <ol class="breadcrumb">
-                <?foreach($global->breadcrumb as $name => $action):?>
-                    <?if($action == $route->action):?>
-                    <li><?=$name;?></li>
-                    <?else:?>
-                    <li><a href="<?=router::URL("/".$global->project->id.($action?"/$action":''));?>"><?=$name;?></a></li>
-                    <?endif;?>
-                <?endforeach;?>
-            </ol>
-            <?endif;?>
-            <h1 class="page-header"><?=$global->title;?></h1>
-            <?=$content;?>
-        </div>
-      </div>
     </div>
 
     <!-- Bootstrap core JavaScript

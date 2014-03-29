@@ -24,7 +24,10 @@ abstract class content{
 			if(is_array($params)) $this->params = $params;
 		}
 		$filename = string::CamelToUnder($key);
-		if(!file_exists($this->dir().$this->path."/$filename.phtml")){
+        if(is_dir($this->dir().$this->path."/$filename")){
+            return $this->__path("/$filename");
+		}
+        elseif(!file_exists($this->dir().$this->path."/$filename.phtml")){
 			$class = get_class($this);
 			$class[0] = strtoupper($class[0]);
 			$ExceptionClass = $class.'Exception';

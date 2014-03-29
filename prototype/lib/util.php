@@ -1,15 +1,23 @@
 <?php
 class util
 {
-
+    const CURRENT = 0;
+    const LAST = -1;
 
 	/**
 	 * Utility to redirect to another page
 	 * 
 	 * @param string location
 	 */
-	public static function Redirect($location = null){
-		if(!$location) $location = $_SERVER['REQUEST_URI'];
+	public static function Redirect($location = self::CURRENT){
+        if(is_string($location)){
+        }
+		else if($location == self::CURRENT){
+            $location = http::path();
+        }
+        else if($location == self::LAST){
+            $location = http::last();
+        }
 		header("Location: $location");
 	}
 	

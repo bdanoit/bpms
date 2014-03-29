@@ -14,12 +14,12 @@ class ManagerTask extends Manager{
 		);
 	}
     
-    public final function listByProjectUser($project_id, $user_id, $prepare = true){
+    public final function listByProjectUser($project_id, $user_id, $complete = 0, $prepare = true){
         $SQL = <<<SQL
 SELECT * FROM
     {$this->database()}.{$this->table()}
 WHERE
-    complete = 0
+    complete = $complete
 AND
     id IN (SELECT task_id FROM {$this->database()}.task_assigned_to WHERE project_id = $project_id AND user_id = $user_id)
 {$this->createOrderBy()}
@@ -81,11 +81,11 @@ SQL;
     /**
     * mark task as complete
     **/
-    public final function complete($project_id, $task_id){
+    public final function complete($project_id, $task_id, $complete = true){
         $result = parent::update(array(
             "project_id"=>$project_id,
             "id"=>$task_id,
-            "complete"=>1
+            "complete"=>(int)$complete
         ));
         var_dump($result);
         return $result;
@@ -119,9 +119,11 @@ SQL;
         $row->end_time = date('H:i', $end);
         $row->start_pretty = $this->date_pretty($start);
         $row->end_pretty = $this->date_pretty($end);
-        if($now > $end) $row->is_late = true;
-        $day = self::day;
-        if(($end/$day - $now/$day) < 3) $row->is_due_soon = true;
+        if(!$row->complete){
+            if($now > $end) $row->is_late = true;
+            $day = self::day;
+            if(($end/$day - $now/$day) < 3) $row->is_due_soon = true;
+        }
 	}
 	
 	protected function validation(){

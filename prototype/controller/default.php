@@ -2,6 +2,9 @@
 class ControllerDefault extends Controller
 {
 	public function __before(){
+	    if(auth::user()){
+	        _global()->projects = run()->manager->project->listByUser(auth::user()->id);
+	    }
 		auth::define(array(
 			"projects"=>auth::USER,
 			"settings"=>auth::USER,
@@ -52,7 +55,7 @@ class ControllerDefault extends Controller
 		));
     }
     
-    public function new_project(){
+    public function new_project($action){
         _global()->title = "New project";
         if($_POST){
             $data = $_POST;
@@ -67,7 +70,7 @@ class ControllerDefault extends Controller
 		));
     }
     
-    public function settings($success = false){
+    public function settings($action, $success = false){
         _global()->title = "Settings";
         $user = auth::user();
         if($_POST){
@@ -83,7 +86,7 @@ class ControllerDefault extends Controller
         ));
     }
     
-	public function logout(){
+	public function logout($action){
 		auth::logout();
 		util::Redirect(router::URL('/'));
 	}

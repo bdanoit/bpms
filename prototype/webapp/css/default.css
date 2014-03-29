@@ -1,10 +1,41 @@
 /* Move down content because we have a fixed navbar that is 50px tall */
 body {
-  padding-top: 50px;
+  padding-top: 70px;
   padding-bottom: 20px;
 }
 
 .form-settings .form-control,
 .form-signin .form-control{
     margin: 10px 0;
+}
+
+div.dashboard{
+    padding-bottom: 50px;
+}
+div.dashboard h3{
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+div.dashboard div.navbar {
+  -webkit-border-radius: 0 !important;
+     -moz-border-radius: 0 !important;
+          border-radius: 0 !important;
+}
+div.dashboard div.bpms-panel{
+    border: 1px solid #e7e7e7;
+    border-top: 0 none;
+}
+div.dashboard div.bpms-panel-body{
+    padding: 30px;
+}
+
+div.dashboard div.navbar{
+    padding-left: 0;
+    margin-bottom: 0;
+}
+div.dashboard div.navbar ul{
+    margin-left: 0;
+}
+div.dashboard .row{
+    margin: 0;
 }

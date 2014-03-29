@@ -1,0 +1,74 @@
+<?if($errors):?>
+<div class="alert alert-danger">
+    <ul>
+        <?foreach($errors as $error):?>
+        <li><?=$error->message;?></li>
+        <?endforeach;?>
+    </ul>
+</div>
+<?endif;?>
+<?if($task):?>
+<div class="col-sm-8">
+
+    <blockquote><?=$task->description;?></blockquote>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Log</h3>
+        </div>
+        <div class="panel-body">
+            <?if($log):?>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>When</th>
+                        <th>Amount</th>
+                        <th>By</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Test</td>
+                        <td>Test</td>
+                        <td>Test</td>
+                        <td><a href="" class="btn btn-default btn-xs">Edit</a></td>
+                    </tr>
+                    <tr>
+                        <td>Test</td>
+                        <td>Test</td>
+                        <td>Test</td>
+                        <td><a href="" class="btn btn-default btn-xs">Edit</a></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <?else:?>
+            <p>No time logged yet</p>
+            <?endif;?>
+        </div>
+    </div>
+
+</div>
+<div class="col-sm-4">
+    <?if($task->complete):?>
+    <div class="alert alert-success">Finished</div>
+    <?else:?>
+    <div class="alert <?if($task->is_late):?>alert-danger<?elseif($task->is_due_soon):?>alert-warning<?else:?>alert-info<?endif;?>">Due <?=$task->end_pretty;?></div>
+    <div class="alert alert-info">Started <?=$task->start_pretty;?></div>
+    <?endif;?>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Collaborators</h3>
+        </div>
+        <div class="panel-body">
+            <?if($task->assigned_to()) foreach($task->assigned_to() as $i => $user):?>
+            <a href="" class="btn btn-med <?if(auth::user()->name == $user->name):?>btn-primary<?else:?>btn-default<?endif;?>"><?=$user->name;?></a>
+            <?endforeach;?>
+        </div>
+    </div>
+
+</div>
+<?else:?>
+<p>Task not found.</p>
+<?endif;?>

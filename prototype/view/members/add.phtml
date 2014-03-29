@@ -7,7 +7,7 @@
     </ul>
 </div>
 <?endif;?>
-<form role="form" method="post" action="<?=router::URL("/$project->id/add-member", "project");?>">
+<form role="form" method="post" action="<?=router::URL("/*id/members/add");?>">
     <div class="form-group">
         <label for="user_name">Username</label>
         <input type="text" name="name" class="form-control" value="<?=$data->name;?>" id="user_name" placeholder="Username">
@@ -24,5 +24,5 @@
         <?endforeach;?>
     </div>
     <input type="submit" class="btn btn-lg btn-primary" value="Add">
-    <a class="btn btn-lg btn-primary" href="<?=router::URL("/$project->id/members", "project");?>" role="button">Cancel</a>
+    <a class="btn btn-lg btn-primary" href="<?=router::URL("/*id/members");?>" role="button">Cancel</a>
 </form>
