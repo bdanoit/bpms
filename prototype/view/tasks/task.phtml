@@ -9,8 +9,9 @@
 <?endif;?>
 <?if($task):?>
 <div class="col-sm-8">
-
+    
     <blockquote><?=$task->description;?></blockquote>
+    
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Log</h3>
@@ -21,25 +22,29 @@
                 <table class="table table-striped">
                     <thead>
                     <tr>
+                        <th>Who</th>
                         <th>When</th>
-                        <th>Amount</th>
-                        <th>By</th>
-                        <th></th>
+                        <th>Total</th>
+                        <th>Note</th>
                     </tr>
                     </thead>
                     <tbody>
+                    <?foreach($log as $entry):?>
                     <tr>
-                        <td>Test</td>
-                        <td>Test</td>
-                        <td>Test</td>
-                        <td><a href="" class="btn btn-default btn-xs">Edit</a></td>
+                        <td>
+                            <?if($entry->user()->id == auth::user()->id):?>
+                            <a class="btn btn-default btn-xs" href="<?=router::URL("/*id/tasks/log/$task->id/edit/$entry->id");?>"><span class="glyphicon glyphicon-pencil"></span></a>
+                            <?endif;?> 
+                            <?=$entry->user()->alias;?>
+                        </td>
+                        <td><?=$entry->pretty_date;?></td>
+                        <td>
+                            <?if($entry->hours):?><?=$entry->hours;?><small>h</small> <?endif;?> 
+                            <?=$entry->minutes;?><small>m</small>
+                        </td>
+                        <td><?=$entry->note;?></td>
                     </tr>
-                    <tr>
-                        <td>Test</td>
-                        <td>Test</td>
-                        <td>Test</td>
-                        <td><a href="" class="btn btn-default btn-xs">Edit</a></td>
-                    </tr>
+                    <?endforeach;?>
                     </tbody>
                 </table>
             </div>
@@ -48,24 +53,37 @@
             <?endif;?>
         </div>
     </div>
-
 </div>
 <div class="col-sm-4">
+
+    <div class="btn-group btn-group-margin">
+        <?if($task->assigned_to_me()):?>
+        <a class="btn btn-default btn-md" href="<?=router::URL("/*id/tasks/log/$task->id/add");?>"><span class="glyphicon glyphicon-time"></span> Log time</a>
+        <?endif;?>
+        <?if(auth::check("edit")):?>
+        <a class="btn btn-default btn-md" href="<?=router::URL("/*id/tasks/edit/$task->id");?>"><span class="glyphicon glyphicon-pencil"></span> Edit</a>
+        <?if(auth::check("remove")):?>
+        <a class="btn btn-danger btn-md" href="<?=router::URL("/*id/tasks/remove/$task->id");?>" onclick="javascript:return confirm('Are you sure you want to remove &quot;<?=$task->name;?>&quot;?');"><span class="glyphicon glyphicon-trash"></span> Remove</a>
+        <?endif;?>
+        <?endif;?>
+    </div>
     <?if($task->complete):?>
-    <div class="alert alert-success">Finished</div>
+    <blockquote>Finished</blockquote>
     <?else:?>
-    <div class="alert <?if($task->is_late):?>alert-danger<?elseif($task->is_due_soon):?>alert-warning<?else:?>alert-info<?endif;?>">Due <?=$task->end_pretty;?></div>
-    <div class="alert alert-info">Started <?=$task->start_pretty;?></div>
+    <blockquote class="<?if($task->is_late):?>alert-danger<?elseif($task->is_due_soon):?>alert-warning<?else:?>alert-info<?endif;?>">Due <?=$task->end_pretty;?></blockquote>
+    <blockquote class="alert-info">Started <?=$task->start_pretty;?></blockquote>
     <?endif;?>
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Collaborators</h3>
         </div>
+        <?if($task->assigned_to()):?>
         <div class="panel-body">
-            <?if($task->assigned_to()) foreach($task->assigned_to() as $i => $user):?>
-            <a href="" class="btn btn-med <?if(auth::user()->name == $user->name):?>btn-primary<?else:?>btn-default<?endif;?>"><?=$user->name;?></a>
+            <?foreach($task->assigned_to() as $i => $user):?>
+            <a href="<?=router::URL("/*id/members/view/{$user->id}");?>" class="btn btn-med <?if($task->assigned_to_me()):?>btn-primary<?else:?>btn-default<?endif;?>"><?=$user->name;?></a>
             <?endforeach;?>
         </div>
+        <?endif;?>
     </div>
 
 </div>

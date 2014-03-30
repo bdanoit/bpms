@@ -8,11 +8,11 @@
 </div>
 <?endif;?>
 <form role="form" method="post">
-  <div class="form-group">
+<div class="form-group">
     <label for="task_name">Name</label>
     <input name="name" type="text" class="form-control" id="task_name" placeholder="Name" value="<?=$task->name;?>">
-  </div>
-  <div class="form-group">
+</div>
+<div class="form-group">
     <fieldset>          
         <div class="control-group">
         <label for="task_assigned_to">Assign to</label>
@@ -25,33 +25,33 @@
             </div>
         </div>
     </fieldset>
-  </div>
-  <div class="form-group">
+</div>
+<div class="form-group">
     <label for="task_start_date">Starts</label>
-    <p>
-    <input type="date" name="start_date" id="task_start_date" value="<?=$task->start_date?$task->start_date:$default->start_date;?>">
-    <input type="time" name="start_time" id="task_start_time" value="<?=$task->start_time?$task->start_time:$default->start_time;?>">
-    </p>
-  </div>
-  <div class="form-group">
+    <div class="form-inline">
+        <input class="form-control" type="date" name="start_date" id="task_start_date" value="<?=$task->start_date?$task->start_date:$default->start_date;?>">
+        <input class="form-control" type="time" name="start_time" id="task_start_time" value="<?=$task->start_time?$task->start_time:$default->start_time;?>">
+    </div>
+</div>
+<div class="form-group">
     <label for="task_start_date">Ends</label>
-    <p>
-    <input type="date" name="end_date" id="task_start_date" value="<?=$task->end_date?$task->end_date:$default->end_date;?>">
-    <input type="time" name="end_time" id="task_start_time" value="<?=$task->end_time?$task->end_time:$default->end_time;?>">
-    </p>
-  </div>
-  <div class="form-group">
+    <div class="form-inline">
+        <input class="form-control" type="date" name="end_date" id="task_start_date" value="<?=$task->end_date?$task->end_date:$default->end_date;?>">
+        <input class="form-control" type="time" name="end_time" id="task_start_time" value="<?=$task->end_time?$task->end_time:$default->end_time;?>">
+    </div>
+</div>
+<div class="form-group">
     <label for="task_description">Description</label>
     <textarea name="description" id="task_description" class="form-control" placeholder="Description" rows="5"><?=$task->description;?></textarea>
-  </div>
-  <div class="form-group">
+</div>
+<div class="form-group">
       <div class="checkbox">
           <label>
               <input type="hidden" value="0" name="complete">
               <input type="checkbox" value="1" name="complete"<?if($task->complete):?> checked<?endif;?>> Mark as complete
           </label>
       </div>
-  </div>
+</div>
     <input type="submit" class="btn btn-lg btn-primary" value="<?=$submit_name;?>">
-    <a class="btn btn-lg btn-default" href="<?=http::last();?>" role="button">Cancel</a>
+    <a class="btn btn-lg btn-danger" href="<?=http::last();?>" role="button">Cancel</a>
 </form>

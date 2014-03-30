@@ -16,7 +16,7 @@
 
     <!-- Custom styles for this template -->
     <link href="/web/css/default.css" rel="stylesheet">
-    <!--link href="/web/css/dashboard.css" rel="stylesheet"-->
+    <link href="/web/css/bootstrap-theme.min.css" rel="stylesheet">
 
     <!-- Just for debugging purposes. Don't actually copy this line! -->
     <!--[if lt IE 9]><script src="/web/js/ie8-responsive-file-warning.js"></script><![endif]-->
@@ -47,7 +47,8 @@
                 <?endif;?>*/?>
             <div class="bpms-panel-body">
                 <h3 class="page-header"><?=$global->title;?></h3>
-                <div class="row"><?=$content;?></div>
+                <?=$content;?>
+                <div class="clearfix"></div>
             </div>
         </div>
     </div>
@@ -60,5 +61,7 @@
     <script src="/web/js/jquery.multi-select.js"></script>
     <script src="/web/js/dashboard.js"></script>
     <script src="/web/js/docs.min.js"></script>
+    <script src="/web/js/typeahead.js"></script>
+    <script src="/web/js/default.js"></script>
   </body>
 </html>

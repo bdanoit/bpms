@@ -37,5 +37,79 @@ div.dashboard div.navbar ul{
     margin-left: 0;
 }
 div.dashboard .row{
-    margin: 0;
+}
+
+th.align-right,
+td.align-right{
+    text-align: right;
+}
+
+.settings div.row {
+    display: table;
+}
+
+.settings div.col-sm-6 {
+    float: none;
+    display: table-cell;
+    vertical-align: top;
+}
+
+.btn-group-margin{
+    margin-bottom: 20px;
+}
+
+.glyphicon-disabled{
+    opacity: .25;
+}
+
+
+
+
+
+
+/**
+ * Typeahead
+ */
+.typeahead,
+.tt-query,
+.tt-hint {
+}
+
+.typeahead {
+  background-color: #fff;
+}
+
+.typeahead:focus {
+  border: 1px solid #e7e7e7;
+}
+
+.tt-query {
+}
+
+.tt-hint {
+  color: #999
+}
+
+.tt-dropdown-menu {
+  width: 14em;
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.tt-suggestion {
+  padding: 3px 20px;
+  line-height: 24px;
+}
+
+.tt-suggestion.tt-cursor {
+  color: #fff;
+  background-color: #0097cf;
+
+}
+
+.tt-suggestion p {
+  margin: 0;
 }

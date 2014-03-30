@@ -14,9 +14,7 @@
             <tr>
                 <th>Name</th>
                 <th>Due</th>
-                <?if(auth::check("edit_task")):?>
-                <th>Tools</th>
-                <?endif;?>
+                <th class="align-right">Tools</th>
             </tr>
             </thead>
             <tbody>
@@ -24,16 +22,18 @@
                 <tr class="<?if($task->complete):?>success<?elseif($task->is_late):?>danger<?elseif($task->is_due_soon):?>warning<?endif;?>">
                     <td><a href="<?=router::URL("/*id/tasks/view/$task->id");?>"><?=$task->name;?></a></td>
                     <td><?=$task->end_pretty;?></td>
-                    <?if(auth::check("edit_task")):?>
-                    <td>
-                        <a class="btn btn-default btn-xs align-right" href="<?=router::URL("/*id/tasks/edit/$task->id");?>">Edit</a>
+                    <td class="align-right">
+                    <div class="btn-group">
+                        <a class="btn btn-default btn-xs align-right<?if($task->assigned_to_me()):?>" href="<?=router::URL("/*id/tasks/log/$task->id/add");?>"<?else:?> disabled"<?endif;?> title="Log time"><span class="glyphicon glyphicon-time"></span></a>
+                        <a class="btn btn-default btn-xs align-right<?if(auth::check("edit")):?>" href="<?=router::URL("/*id/tasks/edit/$task->id");?>"<?else:?> disabled"<?endif;?> title="Edit"><span class="glyphicon glyphicon-pencil"></span></a>
                         <?if($task->complete):?>
-                        <a class="btn btn-success btn-xs align-right" href="<?=router::URL("/*id/tasks/task-incomplete/$task->id");?>">Finished</a>
+                        <a class="btn btn-default btn-xs align-right<?if(auth::check("edit")):?>" href="<?=router::URL("/*id/tasks/task-incomplete/$task->id");?>"<?else:?> disabled"<?endif;?> title="Re-open"><span class="glyphicon glyphicon-folder-open"></span></a>
                         <?else:?>
-                        <a class="btn btn-warning btn-xs align-right" href="<?=router::URL("/*id/tasks/task-complete/$task->id");?>">Not finished</a>
+                        <a class="btn btn-default btn-xs align-right<?if(auth::check("edit")):?>" href="<?=router::URL("/*id/tasks/task-complete/$task->id");?>"<?else:?> disabled"<?endif;?> title="Mark as complete"><span class="glyphicon glyphicon-thumbs-up"></span></a>
                         <?endif;?>
+                        <a class="btn btn-default btn-xs align-right<?if(auth::check("remove")):?>" href="<?=router::URL("/*id/tasks/remove/$task->id");?>"<?else:?> disabled"<?endif;?> title="Remove" onclick="javascript:return confirm('Are you sure you want to remove &quot;<?=$task->name;?>&quot;?');"><span class="glyphicon glyphicon-trash"></span></a>
+                    </div>
                     </td>
-                    <?endif;?>
                 </tr>
                 <?endforeach;?>
             </tbody>

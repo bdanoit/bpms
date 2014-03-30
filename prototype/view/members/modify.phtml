@@ -17,8 +17,9 @@
         <?if($permissions) foreach($permissions as $permission):?>
         <div class="checkbox">
             <label>
+                <span class="glyphicon glyphicon-<?=$permission->icon;?>"></span>
                 <input type="hidden" name="permissions[<?=$permission->id;?>]" value="<?=($permission->id == 1)?1:0;?>">
-                <input name="permissions[<?=$permission->id;?>]" value="1" type="checkbox" <?if($permission->id == 1):?>disabled="true" checked="true"<?elseif(in_array($permission->id, $user_permissions)):?> checked="true"<?endif;?>> <?=$permission->name;?>
+                <input name="permissions[<?=$permission->id;?>]" value="1" type="checkbox"<?if($permission->id == 1):?> disabled="true"<?endif;?><?if(in_array($permission->id, $user_permissions)):?> checked="true"<?endif;?>> <?=$permission->name;?>
             </label>
         </div>
         <?endforeach;?>

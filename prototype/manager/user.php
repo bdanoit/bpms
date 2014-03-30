@@ -1,32 +1,29 @@
 <?php
 class ManagerUser extends Manager{
-	protected function database(){
-		return _global()->mysql->database;
-	}
-	protected function table(){
-		return "user";
-	}
-	protected function order(){
-		return array(
-			"email"=>"ASC"
-		);
-	}
+    protected $table = 'user';
     
     public final function listByProject($id, $prepare = true){
         $SQL = <<<SQL
-SELECT * FROM
-    {$this->database()}.{$this->table()}
-WHERE
-    id IN (SELECT user_id FROM {$this->database()}.project_permission WHERE project_id = $id GROUP BY user_id);
+            SELECT *, $id as project_id FROM
+                $this->table
+            WHERE
+                id IN (SELECT user_id FROM project_permission WHERE project_id = $id GROUP BY user_id);
 SQL;
-        $results = self::query_rows($SQL);
-        if(!$results || !$prepare) return $result;
-        foreach($results as $result){
-            $result->project_id = $id;
-            $result->permissions = function($row){ return run()->manager->permission->listByProjectMember($row->project_id, $row->id); };
-			$this->prepare($result);
-		}
-        return $results;
+        return $this->fetch_many($SQL, NULL, $prepare);
+    }
+    
+    public final function search($string, $prepare = false){
+        if(strlen($string) < 3) return false;
+        $SQL = <<<SQL
+            SELECT name FROM
+                $this->table
+            WHERE
+                name LIKE :query
+SQL;
+        $params = array(
+            "query"=>"$string%"
+        );
+        return $this->fetch_many($SQL, $params, $prepare);
     }
 	
 	public final function checkPassword($user_id, $password){
@@ -43,11 +40,11 @@ SQL;
 	
 	public final function update($params){
 		$new_password = $params["new_password"];
-		if(isset($params["new_password"])){
+		if($params["new_password"][0]){
 			if(!$this->checkPassword($params["id"], $params["password"])){
 				$GLOBALS["errors"][] = (object)array(
 					"code"=>dechex(0),
-					"message"=>"You have entered an incorrect password"
+					"message"=>"Your current password is incorrect"
 				);
 				return false;
 			}
@@ -61,7 +58,7 @@ SQL;
 			}
 			$params["password"] = $new_password[0];
 		}
-		unset($params["new_password"]);
+		unset($params["new_password"], $params["password"]);
         return parent::update($params);
 	}
 	
@@ -108,8 +105,7 @@ SQL;
 	}
 	
 	public final function tryLogin(array $data){
-		$data["password"] = md5($data["password"]);
-		$user = $this->findBy($data);
+		$user = $this->findByUsernameOrEmail($data);
 		if(!$user){
 			$GLOBALS["errors"][] = (object)array(
 				"code"=>dechex(0),
@@ -137,10 +133,35 @@ SQL;
 			->set($hash);
 		return true;
 	}
+    
+    public final function findByUsernameOrEmail(array $data, $prepare = true){
+        $params = array(
+            'id'=>$data['name'] ? $data['name'] : $data['email'],
+            'password'=>md5($data['password'])
+        );
+        $SQL = <<<SQL
+        SELECT * 
+        FROM {$this->table}
+        WHERE (name = :id OR email = :id)
+        AND password = :password
+SQL;
+        return $this->fetch_single($SQL, $params);
+    }
 	
 	protected final function prepare(&$row){
-		//$row->full_name = "$row->first_name $row->last_name";
 		$row->alias = $row->name ? $row->name : $row->email;
+        $row->permissions = function($row){
+            if(!$row->project_id) return false;
+            return run()->manager->permission->listByProjectMember($row->project_id, $row->id);
+        };
+        
+        $row->has_permission = function($row, $pid){
+            if(!$permissions = $row->permissions()) return false;
+            foreach($permissions as $permission){
+                if($permission->id == $pid) return true;
+            }
+            return false;
+        };
 	}
 	
 	protected function validation(){

@@ -1,35 +1,25 @@
 <?php
 class ManagerTask extends Manager{
     const day = 86400;
-	protected function database(){
-		return _global()->mysql->database;
-	}
-	protected function table(){
-		return "task";
-	}
-	protected function order(){
-		return array(
-			"end"=>"ASC",
-            "start"=>"DESC"
-		);
-	}
+    
+    protected $orderBy = array(
+        "end"=>"ASC",
+        "start"=>"ASC"
+    );
+    
+    protected $table = 'task';
     
     public final function listByProjectUser($project_id, $user_id, $complete = 0, $prepare = true){
         $SQL = <<<SQL
 SELECT * FROM
-    {$this->database()}.{$this->table()}
+    $this->table
 WHERE
     complete = $complete
 AND
-    id IN (SELECT task_id FROM {$this->database()}.task_assigned_to WHERE project_id = $project_id AND user_id = $user_id)
-{$this->createOrderBy()}
+    id IN (SELECT task_id FROM task_assigned_to WHERE project_id = $project_id AND user_id = $user_id)
+ORDER BY end ASC, start DESC
 SQL;
-        $results = self::query_rows($SQL);
-        if(!$results || !$prepare) return $result;
-        foreach($results as $result){
-			$this->prepare($result);
-		}
-        return $results;
+        return $this->fetch_many($SQL);
     }
     
     /**
@@ -43,9 +33,9 @@ SQL;
         $status = 0;
         if(parent::insert($data)){
             $project_id = $obj->project_id;
-            $task_id = self::insert_id();
+            $task_id = $this->DBH->lastInsertId();
             foreach($obj->assigned_to as $user_id){
-                if(!self::query("INSERT INTO {$this->database()}.{$this->table()}_assigned_to (project_id, task_id, user_id) VALUES ($project_id, $task_id, $user_id);")){
+                if($this->exec("INSERT INTO {$this->table}_assigned_to (project_id, task_id, user_id) VALUES ($project_id, $task_id, $user_id);")){
                     $status--;
                 }
             }
@@ -67,11 +57,24 @@ SQL;
             $project_id = $obj->project_id;
             $task_id = $data['id'];
             foreach($obj->assigned_to as $user_id){
-                self::query("INSERT INTO {$this->database()}.{$this->table()}_assigned_to (project_id, task_id, user_id) VALUES ($project_id, $task_id, $user_id);");
+                try{
+                    $this->exec("INSERT INTO task_assigned_to (project_id, task_id, user_id) VALUES ($project_id, $task_id, $user_id);");
+                }
+                catch(ManagerException $exc){
+                    //Ignore duplicate entry exception
+                    if($exc->getCode() == 1062){}
+                    else{
+                        $GLOBALS["errors"][] = (object)array(
+                            "code"=>$exc->getCode(),
+                            "message"=>$exc->getMessage()
+                        );
+                        return false;
+                    }
+                }
             }
             if($obj->assigned_to){
                 $ids = implode(',', $obj->assigned_to);
-                self::query("DELETE FROM {$this->database()}.{$this->table()}_assigned_to WHERE project_id = $project_id AND task_id = $task_id AND user_id NOT IN ($ids)");
+                $this->exec("DELETE FROM task_assigned_to WHERE project_id = $project_id AND task_id = $task_id AND user_id NOT IN ($ids)");
             }
             $status = 1;
         }
@@ -94,8 +97,8 @@ SQL;
     public final function assigned_to($project_id, $task_id){
         $SQL = <<<SQL
         SELECT u.id, u.name
-        FROM {$this->database()}.{$this->table()}_assigned_to a
-        LEFT JOIN {$this->database()}.user u
+        FROM task_assigned_to a
+        LEFT JOIN user u
         ON
             a.user_id = u.id
         WHERE
@@ -103,13 +106,18 @@ SQL;
         AND
             a.task_id = $task_id
 SQL;
-        if($result = self::query_rows($SQL)){
-        }
-        return $result;
+        return $this->fetch_many($SQL);
     }
     
 	protected final function prepare(&$row){
         $row->assigned_to = function($row){ return run()->manager->task->assigned_to($row->project_id, $row->id); };
+        $row->assigned_to_me = function($row){
+            if($row->assigned_to()){
+                foreach($row->assigned_to() as $user){
+                    if($user->id == auth::user()->id) return true;
+                }
+            }
+        };
         $start = $row->start = strtotime($row->start);
         $end = $row->end = strtotime($row->end);
         $now = time();

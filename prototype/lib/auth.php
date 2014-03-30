@@ -20,7 +20,8 @@ class auth{
             "project",
             "tasks",
             "members",
-            "milestones"
+            "milestones",
+            "task_log"
         );
         if(in_array($route->controller, $areas) && $route->vars->id){
             $permissions = run()->manager->permission->listByProjectMember($route->vars->id, self::$user->id);
@@ -43,6 +44,13 @@ class auth{
 	public static function logout(){
 		return cookie()->user->delete();
 	}
+    
+    public static function has($level){
+		$user = self::user();
+		if(!$user) return false;
+		if((int)$user->auth_level & (int)$level) return true;
+        return false;
+    }
 	
 	public static function check($action){
 		$level = isset(self::$require[$action]) ? self::$require[$action] : self::$requireAll;

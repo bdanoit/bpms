@@ -2,18 +2,23 @@
 class ControllerProject extends Controller
 {
 	public function __before(){
+        //list of users current projects
 	    if(auth::user()){
 	        _global()->projects = run()->manager->project->listByUser(auth::user()->id);
 	    }
-        $id = router::Current()->vars->id;
-        $this->project = run()->manager->project->findBy(array(
-            "id"=>$id
+        
+        //current defined router variables
+        $vars = router::Current()->vars;
+        
+        //find and store current project
+        _global()->project = $this->project = run()->manager->project->findBy(array(
+            "id"=>$vars->id
         ));
+        
+        //define the directory of views
         $this->view = view()->project;
-        _global()->project = $this->project;
-        _global()->breadcrumb = array(
-            "{$this->project->name}"=>NULL
-        );
+        
+        //define permissions
         auth::defineAll(array(auth::MEMBER));
 	}
     
@@ -26,7 +31,6 @@ class ControllerProject extends Controller
     
     public function add_milestone($project_id, $action){
         _global()->title = "Add a milestone";
-        _global()->breadcrumb[_global()->title] = $action;
         if($_POST){
             $data = (object)$_POST;
             if(run()->manager->projectPermission->insert($this->project->id, $data->email, $data->permissions))

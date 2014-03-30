@@ -23,13 +23,12 @@ define("UPLOAD_DIR", BASE_DIR.'/upload');
  * Required library files
  */
 $required = array(
-	"sql",
 	"content",
 	"controller",
 	"form_auth",
 	"global",
 	"http",
-	"manager",
+	"manager.2.0",
 	"router",
 	"run",
 	"string",
@@ -52,12 +51,13 @@ $config = @parse_ini_file(BASE_DIR.'/config.ini', true);
 if($config) foreach($config as $key => $settings){
 	_global()->$key = (object)$settings;
 }
-if(!_global()->mysql){
-	_global()->mysql = (object)array(
+if(!_global()->db){
+	_global()->db = (object)array(
+        "db"=>"mysql",
 		"host"=>"localhost",
 		"username"=>"root",
 		"password"=>"safe1mysql2",
-		"database"=>"bpms"
+		"dbname"=>"bpms"
 	);
 }
 
@@ -70,27 +70,32 @@ require_once(CONFIG_DIR.'/routes.ini');
  * Resolve and run current action
  */
 $info = router::Resolve();
-$controller = string::Camelize($info->controller);
+$name = string::Camelize($info->controller);
+$ctrl = run()->controller()->$name();
 $method = $info->method;
-if(method_exists(run()->controller()->$controller(), "__before")){
-	$content = run()->controller()->$controller()->__before();
+if(method_exists($ctrl, "__before")){
+	$content = $ctrl->__before();
 }
 if(!auth::check($info->method)){
-	if(method_exists(run()->controller()->$controller(), "forbidden")){
-		$content = run()->controller()->$controller()->forbidden();
+	if(method_exists($ctrl, "forbidden")){
+		$content = $ctrl->forbidden();
 	}
 	else throw new Exception('You do not have permission to access this area');
 }
-else $content = call_user_func_array(array(run()->controller()->$controller(), $method), router::Params());
+else $content = call_user_func_array(array($ctrl, $method), router::Params());
 
 
 /*
  * Output template
  */
-print template()->{$info->template}(array(
+$template = $ctrl->template ? $ctrl->template : $info->template;
+print template()->{$template}(array(
 	"content"=>$content,
     "vars"=>router::Current()->vars,
     "route"=>router::Current(),
     "user"=>auth::user(),
     "global"=>_global()
 ));
+
+# close database connection
+$dbh = NULL;

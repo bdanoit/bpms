@@ -9,14 +9,15 @@
 <?endif;?>
 <form role="form" method="post" action="<?=router::URL("/*id/members/add");?>">
     <div class="form-group">
-        <label for="user_name">Username</label>
-        <input type="text" name="name" class="form-control" value="<?=$data->name;?>" id="user_name" placeholder="Username">
+        <label for="ac_user_pid_<?=$project->id;?>">Username</label>
+        <div><input type="text" name="name" class="form-control ac-user" value="<?=$data->name;?>" id="ac_user_pid_<?=$project->id;?>" placeholder="Username"></div>
     </div>
     <div class="form-group">
         <label>Permissions</label>
         <?if($permissions) foreach($permissions as $permission):?>
         <div class="checkbox">
             <label>
+                <span class="glyphicon glyphicon-<?=$permission->icon;?>"></span>
                 <input type="hidden" name="permissions[<?=$permission->id;?>]" value="<?=($permission->id == 1)?1:0;?>">
                 <input name="permissions[<?=$permission->id;?>]" value="1" type="checkbox" <?if($permission->id == 1):?>disabled="true" checked="true"<?endif;?>> <?=$permission->name;?>
             </label>
@@ -24,5 +25,5 @@
         <?endforeach;?>
     </div>
     <input type="submit" class="btn btn-lg btn-primary" value="Add">
-    <a class="btn btn-lg btn-primary" href="<?=router::URL("/*id/members");?>" role="button">Cancel</a>
+    <a class="btn btn-lg btn-danger" href="<?=router::URL("/*id/members");?>" role="button">Cancel</a>
 </form>

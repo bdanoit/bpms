@@ -1,0 +1,39 @@
+<?if($errors):?>
+<div class="alert alert-danger">
+    <ul>
+        <?foreach($errors as $error):?>
+        <li><?=$error->message;?></li>
+        <?endforeach;?>
+    </ul>
+</div>
+<?endif;?>
+<form role="form" method="post">
+<?if($task):?>
+<blockquote><?=$task->name;?></blockquote>
+<?endif;?>
+<div class="form-group">
+    <label for="log_start_date" class="control-label">Start</label>
+    <div class="form-inline">
+        <input class="form-control" type="date" name="start_date" id="log_start_date" value="<?=$log->start_date?$log->start_date:$default->date;?>">
+        <input class="form-control" type="time" name="start_time" id="log_start_time" value="<?=$log->start_time?$log->start_time:$default->time;?>">
+    </div>
+</div>
+<div class="form-group">
+    <label for="log_end_date" class="control-label">End</label>
+    <div class="form-inline">
+        <input class="form-control" type="date" name="end_date" id="log_end_date" value="<?=$log->end_date?$log->end_date:$default->date;?>">
+        <input class="form-control" type="time" name="end_time" id="log_end_time" value="<?=$log->end_time?$log->end_time:$default->time;?>">
+    </div>
+</div>
+<div class="form-group">
+    <label for="log_note" class="control-label">Note</label>
+    <div>
+        <textarea name="note" id="log_note" class="form-control" placeholder="What did you work on?" maxlength="240" rows="5"><?=$log->note;?></textarea>
+    </div>
+</div>
+<input type="submit" class="btn btn-lg btn-primary" value="<?=$submit_name;?>">
+<a class="btn btn-lg btn-default" href="<?=http::last();?>" role="button">Cancel</a>
+<?if($log):?>
+<a class="btn btn-lg btn-danger" href="<?=router::URL("/*id/tasks/log/$task->id/remove/$log->id");?>" role="button">Remove</a>
+<?endif;?>
+</form>

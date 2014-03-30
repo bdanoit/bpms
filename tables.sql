@@ -1,5 +1,4 @@
 DROP TABLE IF EXISTS task_assigned_to;
-/*DROP TABLE IF EXISTS task_permission;*/
 DROP TABLE IF EXISTS project_permission;
 DROP TABLE IF EXISTS permission;
 DROP TABLE IF EXISTS task;
@@ -42,10 +41,29 @@ CREATE TABLE task(
     complete tinyint(1) not null default 0
 )ENGINE=InnoDB CHARACTER SET=utf8;
 
+CREATE TABLE task_log(
+    project_id int not null references project(id) ON DELETE CASCADE,
+    task_id int not null references user(id) ON DELETE CASCADE,
+    user_id int not null references user(id) ON DELETE CASCADE,
+    id int not null primary key auto_increment,
+    start datetime not null,
+    end datetime not null,
+    note varchar(240),
+    index(start),
+    index(end),
+    index(project_id, task_id, user_id)
+)ENGINE=InnoDB CHARACTER SET=utf8;
+
 CREATE TABLE permission(
     id int primary key auto_increment,
-    name char(64)
+    name char(64),
+    icon char(16)
 )ENGINE=InnoDB CHARACTER SET=utf8;
+INSERT INTO permission (name, icon) VALUES
+    ('Member', 'user'),
+    ('Edit', 'pencil'),
+    ('Remove', 'trash'),
+    ('Grant', 'gift');
 
 CREATE TABLE project_permission(
     project_id int references project(id) ON DELETE CASCADE,
@@ -53,13 +71,6 @@ CREATE TABLE project_permission(
     permission_id int references permission(id),
     UNIQUE(project_id,user_id,permission_id)
 )ENGINE=InnoDB CHARACTER SET=utf8;
-
-/*CREATE TABLE task_permission(
-    project_id int references project(id),
-    task_id int references task(id),
-    user_id int references user(id),
-    permission_id int references permission(id)
-)ENGINE=InnoDB CHARACTER SET=utf8;*/
 
 CREATE TABLE task_assigned_to(
     project_id int references project(id),

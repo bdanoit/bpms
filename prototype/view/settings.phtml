@@ -1,4 +1,5 @@
 <div class="jumbotron">
+    <h1>Settings</h1>
     <?if($errors):?>
     <div class="alert alert-danger">
         <ul>
@@ -12,20 +13,24 @@
         <strong>Settings updated.</strong>
     </div>
     <?endif;?>
-    <h1>Settings</h1>
-    <form class="form-settings" method="post" action="/settings">
-    <p>
-        <label>Current Password</label>
-        <input type="password" class="form-control" name="password" placeholder="Current Password" value="">
-    </p>
-    <p>
-        <label>New Password</label>
-        <input type="password" class="form-control" name="new_password[]" placeholder="New Password" value="">
-        <input type="password" class="form-control" name="new_password[]" placeholder="Confirm password" value="">
-    </p>
-    <p>
+    <form class="form-settings" role="form" method="post" action="/settings">
+    <div class="form-group">
+        <label class="control-label">Modify email</label>
+        <input type="email" class="form-control" name="email" placeholder="Current Password" value="<?=$user->email;?>">
+    </div>
+    <label class="control-label">Change password</label>
+    <div class="form-group">
+        <input type="password" class="form-control" name="password" placeholder="Current Password">
+        <span class="help-block">Enter your current password to confirm the changes</span>
+        <input type="password" class="form-control" name="new_password[]" placeholder="New Password">
+        <input type="password" class="form-control" name="new_password[]" placeholder="Confirm password">
+    </div>
+    <!--div class="form-group">
+        <label class="control-label">Current password</label>
+    </div-->
+    <div class="form-group">
         <input type="submit" class="btn btn-lg btn-primary" value="Update">
-        <a class="btn btn-lg btn-primary" href="/settings" role="button">Cancel</a>
-    </p>
+        <a class="btn btn-lg btn-danger" href="/" role="button">Cancel</a>
+    </div>
     </form>
 </div>

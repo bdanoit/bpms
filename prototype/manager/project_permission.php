@@ -1,16 +1,6 @@
 <?php
 class ManagerProjectPermission extends Manager{
-	protected function database(){
-		return _global()->mysql->database;
-	}
-	protected function table(){
-		return "project_permission";
-	}
-	protected function order(){
-		return array(
-			"project_id"=>"ASC"
-		);
-	}
+    protected $table = 'project_permission';
     
     public final function insert($project_id, $user_name, array $permissions){
         return self::update($project_id, $user_name, $permissions, true);
@@ -19,6 +9,8 @@ class ManagerProjectPermission extends Manager{
     public final function update($project_id, $user_name, array $permissions, $insert = false){
         $user = run()->manager->user->findBy(array("name"=>$user_name));
         $project = run()->manager->project->findBy(array("id"=>$project_id));
+        
+        //if this is an insert, and user is already a member
         if($insert && $this->findBy(array("user_id"=>$user->id,"project_id"=>$project_id))){
 			$GLOBALS["errors"][] = (object)array(
 				"code"=>dechex(0),
@@ -26,6 +18,8 @@ class ManagerProjectPermission extends Manager{
 			);
             return false;
         }
+        
+        //If the user does not exist
         if(!$user){
 			$GLOBALS["errors"][] = (object)array(
 				"code"=>dechex(0),
@@ -33,6 +27,7 @@ class ManagerProjectPermission extends Manager{
 			);
             return false;
         }
+        
         foreach($permissions as $id => $insert){
             $data = array(
                 "project_id"=>$project_id,
@@ -43,13 +38,13 @@ class ManagerProjectPermission extends Manager{
                 try{
                     parent::insert($data);
                 }
-                catch(SQLException $exc){
-                    if(strstr($exc->message(), 'Duplicate entry')){
-                    }
+                catch(ManagerException $exc){
+                    //Ignore duplicate entry exception
+                    if($exc->getCode() == 1062){}
                     else{
                         $GLOBALS["errors"][] = (object)array(
-                            "code"=>dechex(0),
-                            "message"=>$exc->message()
+                            "code"=>$exc->getCode(),
+                            "message"=>$exc->getMessage()
                         );
                         return false;
                     }
@@ -63,7 +58,16 @@ class ManagerProjectPermission extends Manager{
                     );
                     return false;
                 }
-                parent::deleteBy($data);
+                try{
+                    parent::deleteBy($data);
+                }
+                catch(ManagerException $exc){
+                    $GLOBALS["errors"][] = (object)array(
+                        "code"=>$exc->getCode(),
+                        "message"=>$exc->getMessage()
+                    );
+                    return false;
+                }
             }
         }
         return true;
