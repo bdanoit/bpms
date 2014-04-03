@@ -1,6 +1,6 @@
 <?php
 class auth{
-	const USER = 0;
+	const USER = 16;
 	const MEMBER = 1;
 	const EDIT = 2;
 	const DELETE = 4;
@@ -20,10 +20,13 @@ class auth{
             "project",
             "tasks",
             "members",
-            "milestones",
+            "milestone",
             "task_log"
         );
-        if(in_array($route->controller, $areas) && $route->vars->id){
+        if(self::$user){
+            self::$user->auth_level = auth::USER;
+        }
+        if(in_array($route->controller, $areas) && $route->vars->id && self::$user){
             $permissions = run()->manager->permission->listByProjectMember($route->vars->id, self::$user->id);
             if($permissions) foreach($permissions as $permission){
                 self::$user->auth_level = self::$user->auth_level | pow(2,($permission->id-1));

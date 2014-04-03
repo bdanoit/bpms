@@ -1,4 +1,14 @@
 $(document).ready(function(){
+    
+    
+    $('#bpms-overview').each(function(){
+        var w = $(this).children().attr('id') * 14 * 2;
+        $(this).scrollLeft(w - $(this).width()/2);
+        $(this).find('.bpms-tooltip').tooltip({minWidth:'10em'});
+        console.log($(this).find('.progress a'));
+    });
+    
+    // enable autocomplete
     $('.ac-user').each(function(){
         var id = $(this).attr('id').match(/ac_user_pid_(\d+)/);
         if(!id) return;

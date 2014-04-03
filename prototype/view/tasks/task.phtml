@@ -68,7 +68,7 @@
         <?endif;?>
     </div>
     <?if($task->complete):?>
-    <blockquote>Finished</blockquote>
+    <blockquote class="alert-success">Finished</blockquote>
     <?else:?>
     <blockquote class="<?if($task->is_late):?>alert-danger<?elseif($task->is_due_soon):?>alert-warning<?else:?>alert-info<?endif;?>">Due <?=$task->end_pretty;?></blockquote>
     <blockquote class="alert-info">Started <?=$task->start_pretty;?></blockquote>

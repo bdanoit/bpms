@@ -1,16 +1,13 @@
-
+<?if(!$tasks):?>
+<p>No tasks yet</p>
+<?else:?>
 <style type="text/css">
 .bpms-overview{
-    width: 100%;
     font-size: 1em;
-    overflow: hidden;
+    overflow: auto;
     border: 1px solid #ccc;
 }
 .bpms-overview-content{
-    margin-bottom: -1px;
-}
-.bpms-overview-shim{
-    width: 1000em;
 }
 
 .bpms-overview-content,
@@ -20,14 +17,14 @@
     float: left;
 }
 
-.bpms-ov-row{
-    width: 10000px;
+.bpms-ov-active{
+    font-weight: bold;
+    background-color: #f1f1f1;
 }
 .bpms-ov-cell{
     text-align: center;
     width: 100%;
-    margin-bottom: -1px;
-    border-bottom: 1px solid #ccc;
+    border-top: 1px solid #ccc;
 }
 .bpms-ov-cell .bpms-ov-content{
     display: block;
@@ -38,55 +35,97 @@
 .bpms-clear{
     clear: both;
 }
-.bpms-ov-month{
-    width: 62em;
-}
+.bpms-ov-month28{width: 56em;}
+.bpms-ov-month29{width: 58em;}
+.bpms-ov-month30{width: 60em;}
+.bpms-ov-month31{width: 62em;}
 .bpms-ov-day{
     width: 2em;
 }
+
+.bpms-ov-entry{
+    position: relative;
+    z-index: 999;
+}
+.bpms-ov-eshim{
+    position: relative;
+    top: 0.2em;
+}
+.bpms-ov-entry .progress{
+    height: 1.6em;
+    margin: 0;
+}
 </style>
 
-<div class="bpms-overview">
+<div id="bpms-overview" class="bpms-overview">
+<div class="bpms-overview-content" id="<?=round((time() - strtotime(date('m/1/Y', $bounds->start)))/86400);?>">
+<?$start = $timestamp = $bounds->start;?>
+<?$end = $bounds->end;?>
+<?if(date('n', $start)==date('n', $end))$end = strtotime("+1 month", $timestamp);?>
+<?$diff = $end - $start;?>
+<?$length = ceil((int)($diff / 86400));?>
+<?$width = 0;?>
+<?while($timestamp <= strtotime("+1 month", $end)):?>
 
-<div class="bpms-overview-content"><div class="bpms-overview-shim">
-
-<div class="bpms-ov-month">
+<?$year=(int)date('Y', $timestamp);?>
+<?$m=(int)date('n', $timestamp);?>
+<?$days_in_mo=(int)date('t', strtotime("$m/1/$year"));?>
+<div class="bpms-ov-month bpms-ov-month<?=$days_in_mo;?>">
     <div class="bpms-ov-cell">
-        <div class="bpms-ov-content">January</div>
+        <div class="bpms-ov-content<?if("$m/1/$year" == date('n/1/Y')):?> bpms-ov-active<?endif;?>"><?=$day = date('F', strtotime("$m/1/$year"));?><?if((int)date('Y', strtotime("$m/1/$year")) != date('Y', time())):?> <?=date('Y', strtotime("$m/1/$year"));?><?endif;?></div>
     </div>
-    <?for($i = 1; $i <= 31; $i++):?>
+    <?for($i = 1; $i <= $days_in_mo; $i++):?>
     <div class="bpms-ov-day">
         <div class="bpms-ov-cell">
-            <div class="bpms-ov-content"><?=$i;?></div>
+            <div class="bpms-ov-content<?if("$m/$i/$year" == date('n/j/Y')):?> bpms-ov-active<?endif;?>"><?=$i;?></div>
         </div>
     </div>
     <?endfor;?>
-    <?for($i = 1; $i <= 31; $i++):?>
+    <?for($i = 1; $i <= $days_in_mo; $i++):?>
+    <?$width+=2;?>
     <div class="bpms-ov-day">
         <div class="bpms-ov-cell">
-            <div class="bpms-ov-content"><?$day = date('D', strtotime("1/$i/2014")); echo $day[0];?></div>
+            <div class="bpms-ov-content<?if("$m/$i/$year" == date('n/j/Y')):?> bpms-ov-active<?endif;?>"><?$day = date('D', strtotime("$m/$i/$year")); echo $day[0];?></div>
         </div>
     </div>
     <?endfor;?>
-    <?for($r = 1; $r <= 10; $r++):?>
-    <?for($i = 1; $i <= 31; $i++):?>
+    <?foreach($tasks as $index => $task):?>
+    <?$used = array();?>
+    <?for($i = 1; $i <= $days_in_mo; $i++):?>
     <div class="bpms-ov-day">
         <div class="bpms-ov-cell">
-            <div class="bpms-ov-content"></div>
+            <div class="bpms-ov-content<?if("$m/$i/$year" == date('n/j/Y')):?> bpms-ov-active<?endif;?>">
+                <?if(strtotime(date("n/j/Y", $task->start)) == strtotime("$m/$i/$year")):?>
+                <div class="bpms-ov-entry" style="left:<?=round(($task->start-strtotime("$m/$i/$year"))/86400,1)*2;?>em;width:<?=round(($task->end-$task->start)/86400, 1)*2;?>em;">
+                    <div class="bpms-ov-eshim">
+                    <div class="progress progress-striped">
+                        <a title="<?=preg_replace('#\s#', '&nbsp;', $task->name);?>" data-toggle="tooltip" data-placement="top" href="<?=router::URL("/*id/tasks/view/$task->id");?>" class="bpms-tooltip progress-bar<?if($task->complete):?> progress-bar-success<?elseif($task->is_late):?> progress-bar-danger<?elseif($task->is_due_soon):?> progress-bar-warning<?else:?> progress-bar-info<?endif;?>" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                            <span class="sr-only"><?=$task->name;?></span>
+                        </a>
+                    </div>
+                    </div>
+                </div>
+                <?endif;?>
+            </div>
         </div>
     </div>
     <?endfor;?>
-    <?endfor;?>
+    <?endforeach;?>
+    
 </div>
 
-<div class="bpms-ov-month">
-    <div class="bpms-ov-cell">
-        <div class="bpms-ov-content">February</div>
-    </div>
-</div>
+<?$timestamp = strtotime("+1 month", $timestamp);?>
+<?endwhile;?>
 
-</div></div>
+<style type="text/css">
+.bpms-overview-content{
+    width: <?=$width;?>em;
+}
+</style>
+
+</div>
 
 <div class="bpms-clear"></div>
 
 </div>
+<?endif;?>

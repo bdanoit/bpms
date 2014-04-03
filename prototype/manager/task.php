@@ -11,13 +11,13 @@ class ManagerTask extends Manager{
     
     public final function listByProjectUser($project_id, $user_id, $complete = 0, $prepare = true){
         $SQL = <<<SQL
-SELECT * FROM
-    $this->table
-WHERE
-    complete = $complete
-AND
-    id IN (SELECT task_id FROM task_assigned_to WHERE project_id = $project_id AND user_id = $user_id)
-ORDER BY end ASC, start DESC
+        SELECT * FROM
+            $this->table
+        WHERE
+            complete = $complete
+        AND
+            id IN (SELECT task_id FROM task_assigned_to WHERE project_id = $project_id AND user_id = $user_id)
+        ORDER BY end ASC, start DESC
 SQL;
         return $this->fetch_many($SQL);
     }
@@ -94,7 +94,7 @@ SQL;
         return $result;
     }
     
-    public final function assigned_to($project_id, $task_id){
+    public final function assignedTo($project_id, $task_id, $prepare = true){
         $SQL = <<<SQL
         SELECT u.id, u.name
         FROM task_assigned_to a
@@ -106,11 +106,28 @@ SQL;
         AND
             a.task_id = $task_id
 SQL;
-        return $this->fetch_many($SQL);
+        return $this->fetch_many($SQL, NULL, $prepare);
+    }
+    
+    public final function projectOverviewBounds($project_id, $prepare = false){
+        $SQL = <<<SQL
+        SELECT
+            MIN(start) AS start,
+            MAX(end) AS end,
+            AVG(UNIX_TIMESTAMP(start)) as start_avg,
+            AVG(UNIX_TIMESTAMP(end)) as end_avg
+        FROM task
+        WHERE project_id = $project_id
+SQL;
+        $row = $this->fetch_single($SQL, NULL, false);
+        if(!$row) return false;
+        $row->start = strtotime($row->start);
+        $row->end = strtotime($row->end);
+        return $row;
     }
     
 	protected final function prepare(&$row){
-        $row->assigned_to = function($row){ return run()->manager->task->assigned_to($row->project_id, $row->id); };
+        $row->assigned_to = function($row){ return run()->manager->task->assignedTo($row->project_id, $row->id); };
         $row->assigned_to_me = function($row){
             if($row->assigned_to()){
                 foreach($row->assigned_to() as $user){

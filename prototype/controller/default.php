@@ -8,7 +8,8 @@ class ControllerDefault extends Controller
 		auth::define(array(
 			"projects"=>auth::USER,
 			"settings"=>auth::USER,
-			"logout"=>auth::USER
+			"logout"=>auth::USER,
+			"new_project"=>auth::USER
 		));
 	}
     

@@ -26,8 +26,15 @@
                 <?endif;?>
             </ul>
         </li>
-        <?/*if(auth::check("add_milestone")):?>
-        <li<?if($vars->action=="add-milestone"):?> class="active"<?endif;?>><a href="/project/<?=$global->project->id;?>/add-milestone">Add a milestone</a></li>
-        <?endif;*/?>
+        <li class="<?if($route->controller == "milestone"):?>active <?endif;?>dropdown">
+            <a href="<?=router::URL("/*id/milestone");?>" class="dropdown-toggle" data-toggle="dropdown">Milestones <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+                <li><a href="<?=router::URL("/*id/milestone");?>">List</a></li>
+                <?if(auth::has(auth::EDIT)):?>
+                <li class="divider"></li>
+                <li><a href="<?=router::URL("/*id/milestone/add");?>">Add a milestone</a></li>
+                <?endif;?>
+            </ul>
+        </li>
     </ul>
 </div>

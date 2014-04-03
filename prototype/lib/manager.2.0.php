@@ -145,7 +145,7 @@ abstract class Manager{
         
         # turn arrays into formatted strings for sql statement
         $set = $this->arr_to_string($attributes, ',', '`$v`=:$v');
-        $where = $this->arr_to_string($uk, ',', '`$v`=:$v');
+        $where = $this->arr_to_string($uk, ' AND ', '`$v`=:$v');
         
         # execute statement
         return $this->exec("UPDATE $this->table SET $set WHERE $where", $data);

@@ -34,17 +34,6 @@
         <h1><?=$global->project->name;?></h1>
         <?=view()->nav->project(array('user'=>$user,"vars"=>$vars,"route"=>$route,"global"=>$global));?>
         <div class="bpms-panel">
-                <?/*<?if($global->breadcrumb):?>
-                <ol class="breadcrumb">
-                    <?foreach($global->breadcrumb as $name => $action):?>
-                        <?if($action == $route->action):?>
-                        <li><?=$name;?></li>
-                        <?else:?>
-                        <li><a href="<?=router::URL("/".$global->project->id.($action?"/$action":''));?>"><?=$name;?></a></li>
-                        <?endif;?>
-                    <?endforeach;?>
-                </ol>
-                <?endif;?>*/?>
             <div class="bpms-panel-body">
                 <h3 class="page-header"><?=$global->title;?></h3>
                 <?=$content;?>
@@ -62,6 +51,7 @@
     <script src="/web/js/dashboard.js"></script>
     <script src="/web/js/docs.min.js"></script>
     <script src="/web/js/typeahead.js"></script>
+    <script src="/web/js/jquery.slimscroll.js"></script>
     <script src="/web/js/default.js"></script>
   </body>
 </html>

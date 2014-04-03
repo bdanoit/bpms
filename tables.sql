@@ -80,6 +80,35 @@ CREATE TABLE task_assigned_to(
 )ENGINE=InnoDB CHARACTER SET=utf8;
 
 
+/* APPLICATION ERROR */
+DROP PROCEDURE IF EXISTS raise_application_error;
+DROP PROCEDURE IF EXISTS get_last_custom_error;
+DROP FUNCTION IF EXISTS get_last_custom_error;
+DROP PROCEDURE IF EXISTS fix_last_custom_error;
+DROP TABLE IF EXISTS RAISE_ERROR;
+DELIMITER $$
+
+CREATE PROCEDURE raise_application_error( IN CODE INTEGER, IN MESSAGE VARCHAR(255), IN TABLENAME VARCHAR(30), IN KEYVALUE VARCHAR(50)) SQL SECURITY INVOKER DETERMINISTIC
+BEGIN
+   CREATE TEMPORARY TABLE IF NOT EXISTS RAISE_ERROR(F1 INT NOT NULL);
+   SELECT CODE, MESSAGE, TABLENAME, KEYVALUE INTO @error_code, @error_message, @error_table, @error_key ;
+   INSERT INTO RAISE_ERROR VALUES(NULL);
+END;
+$$
+
+CREATE PROCEDURE fix_last_custom_error()
+   IF @error_code = 1234 THEN 
+      DELETE FROM Classes WHERE class = @error_key;
+   END IF;
+$$
+
+CREATE FUNCTION get_last_custom_error()
+   RETURNS VARCHAR(200) DETERMINISTIC
+   RETURN(@error_message);
+$$
+DELIMITER ;
+/* END APPLICATION ERROR */
+
 
 
 DELIMITER $$
@@ -114,6 +143,70 @@ FOR EACH ROW
         INSERT INTO project_permission (project_id, user_id, permission_id) SELECT NEW.id AS project_id, NEW.creator_id AS user_id, id AS permission_id FROM permission;
 END$$
 DELIMITER ;
+
+
+/*Check to make sure phase end date happen after start date*/
+DROP TRIGGER IF EXISTS phaseEndDateBeforeStart;
+DELIMITER $$
+CREATE TRIGGER phaseEndDateBeforeStart
+   BEFORE INSERT ON phase
+   FOR EACH ROW
+BEGIN
+   IF NEW.start > NEW.end THEN
+      CALL raise_application_error(1234, 'Cant start after end date', 'phase', NEW.start);
+      CALL get_last_custom_error();       
+   END IF;
+END$$ 
+
+
+
+
+/*Check to make sure taskend date happen after start date*/
+DROP TRIGGER IF EXISTS taskEndDateBeforeStart;
+DELIMITER $$
+CREATE TRIGGER taskEndDateBeforeStart
+   BEFORE INSERT ON task
+   FOR EACH ROW
+BEGIN
+   IF NEW.start > NEW.end THEN
+      CALL raise_application_error(1235, 'Cant start after end date', 'task', NEW.start);
+      CALL get_last_custom_error();       
+   END IF;
+END$$ 
+
+
+/*Check to make sure taskend date happen after start date*/
+DROP TRIGGER IF EXISTS taskEndDateBeforeStartUpdate;
+DELIMITER $$
+CREATE TRIGGER taskEndDateBeforeStartUpdate
+   BEFORE UPDATE ON task
+   FOR EACH ROW
+BEGIN
+   IF NEW.start > NEW.end THEN
+      CALL raise_application_error(1235, 'Cant start after end date', 'task', NEW.start);
+      CALL get_last_custom_error();       
+   END IF;
+END$$
+
+/*Check to make sure project creators can't be removed from a project*/
+DROP TRIGGER IF EXISTS createrCantBeRemovedFromProject;
+CREATE TRIGGER createrCantBeRemovedFromProject
+   BEFORE DELETE ON project_permission
+   FOR EACH ROW
+BEGIN
+   IF EXISTS (SELECT id FROM project WHERE creator_id = OLD.user_id) THEN
+      CALL raise_application_error(1236, 'cant remove create from project', 'project_permission', OLD.user_id);
+      CALL get_last_custom_error(); 
+   END IF;
+END$$
+
+
+
+/* VIEWS */
+DROP VIEW IF EXISTS userProject;
+CREATE OR REPLACE VIEW userProject AS
+SELECT name, project_id, user_id,creator_id
+FROM project_permission NATURAL JOIN project;
 
 /*
 DELIMITER $$
