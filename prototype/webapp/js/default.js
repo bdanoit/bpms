@@ -4,8 +4,9 @@ $(document).ready(function(){
     $('#bpms-overview').each(function(){
         var w = $(this).children().attr('id') * 14 * 2;
         $(this).scrollLeft(w - $(this).width()/2);
+        $(this).css({'overflow':'hidden'}).kinetic();
         $(this).find('.bpms-tooltip').tooltip({minWidth:'10em'});
-        console.log($(this).find('.progress a'));
+        $(this).find('.progress a');
     });
     
     // enable autocomplete

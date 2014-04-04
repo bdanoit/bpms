@@ -62,6 +62,7 @@ class ControllerTasks extends Controller
         _global()->title = "Create task";
         if($data = $_POST){
             $data['project_id'] = $project_id;
+            $data['creator_id'] = auth::user()->id;
             if(run()->manager->task->insert($data)){
                 util::Redirect(router::URL("/*id/tasks/all"));
             }

@@ -8,6 +8,9 @@ class ManagerMilestone extends Manager{
         $row->end_date = date('Y-m-d', $end);
         $row->end_time = date('H:i', $end);
         $row->end_pretty = date('F j, Y', $end);
+        $row->last = function() use ($row){
+            return run()->manager->milestone->findLastByProject($row->project_id, $row->end);
+        };
 	}
 	
     public final function insert(array $data){
@@ -18,6 +21,38 @@ class ManagerMilestone extends Manager{
     public final function update(array $data, array $uk = array('project_id', 'id')){
         $this->beforeInsert($data);
         return parent::update($data, $uk);
+    }
+    
+    /**
+     * Finds nearest milestone ending after given unix timestamp
+     */
+    public final function findNextByProject($project_id, $timestamp){
+        $datetime = date("Y-m-d H:i:s", $timestamp);
+        $SQL = <<<SQL
+        SELECT *
+        FROM $this->table 
+        WHERE project_id = $project_id 
+        AND end > '$datetime' 
+        ORDER BY end ASC
+        LIMIT 1
+SQL;
+        return $this->fetch_single($SQL);
+    }
+    
+    /**
+     * Finds nearest milestone ending before given unix timestamp
+     */
+    public final function findLastByProject($project_id, $timestamp){
+        $datetime = date("Y-m-d H:i:s", $timestamp);
+        $SQL = <<<SQL
+        SELECT *
+        FROM $this->table 
+        WHERE project_id = $project_id 
+        AND '$datetime' > end 
+        ORDER BY end DESC
+        LIMIT 1
+SQL;
+        return $this->fetch_single($SQL, NULL);
     }
     
     protected function beforeInsert(array &$data){

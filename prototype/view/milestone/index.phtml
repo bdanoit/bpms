@@ -14,7 +14,9 @@
             <tr>
                 <th>Name</th>
                 <th>Ends</th>
+                <?if(auth::has(auth::EDIT)):?>
                 <th class="align-right">Tools</th>
+                <?endif;?>
             </tr>
             </thead>
             <tbody>
@@ -22,12 +24,14 @@
                 <tr>
                     <td><a href="<?=router::URL("/*id/milestone/modify/$milestone->id");?>"><?=$milestone->name;?></a></td>
                     <td><?=$milestone->end_pretty;?></td>
+                    <?if(auth::has(auth::EDIT)):?>
                     <td class="align-right">
                     <div class="btn-group">
                         <a class="btn btn-xs btn-default<?if(!auth::has(auth::EDIT)):?> disabled<?endif;?>" href="<?=router::URL("/*id/milestone/modify/$milestone->id");?>" title="Modify milestone"><span class="glyphicon glyphicon-pencil"></span></a>
                         <a class="btn btn-xs btn-default<?if(!auth::has(auth::DELETE)):?> disabled<?endif;?>" href="<?=router::URL("/*id/milestone/remove/$milestone->id");?>" title="Remove milestone"><span class="glyphicon glyphicon-trash"></span></a>
                     </div>
                     </td>
+                    <?endif;?>
                 </tr>
                 <?endforeach;?>
             </tbody>

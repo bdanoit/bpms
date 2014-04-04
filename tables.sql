@@ -25,9 +25,9 @@ CREATE TABLE phase(
     project_id int not null references project(id) ON DELETE CASCADE,
     name char(64) not null,
     description text,
-    start datetime not null,
     end datetime not null,
-    creator_id int references user(id)
+    creator_id int references user(id),
+    index(end)
 )ENGINE=InnoDB CHARACTER SET=utf8;
 
 CREATE TABLE task(
@@ -38,7 +38,9 @@ CREATE TABLE task(
     start datetime not null,
     end datetime not null,
     creator_id int references user(id),
-    complete tinyint(1) not null default 0
+    complete tinyint(1) not null default 0,
+    index(start),
+    index(end)
 )ENGINE=InnoDB CHARACTER SET=utf8;
 
 CREATE TABLE task_log(
@@ -52,6 +54,15 @@ CREATE TABLE task_log(
     index(start),
     index(end),
     index(project_id, task_id, user_id)
+)ENGINE=InnoDB CHARACTER SET=utf8;
+
+CREATE TABLE task_email_alerts(
+    project_id int not null references project(id) ON DELETE CASCADE,
+    task_id int not null references user(id) ON DELETE CASCADE,
+    `when` datetime not null,
+    `type` int not null,
+    index(`when`),
+    index(project_id, task_id)
 )ENGINE=InnoDB CHARACTER SET=utf8;
 
 CREATE TABLE permission(
@@ -190,15 +201,56 @@ END$$
 
 /*Check to make sure project creators can't be removed from a project*/
 DROP TRIGGER IF EXISTS createrCantBeRemovedFromProject;
+DELIMITER $$
 CREATE TRIGGER createrCantBeRemovedFromProject
    BEFORE DELETE ON project_permission
    FOR EACH ROW
 BEGIN
-   IF EXISTS (SELECT id FROM project WHERE creator_id = OLD.user_id) THEN
+   IF EXISTS (SELECT id FROM project WHERE id = OLD.project_id AND creator_id = OLD.user_id) THEN
       CALL raise_application_error(1236, 'cant remove create from project', 'project_permission', OLD.user_id);
       CALL get_last_custom_error(); 
    END IF;
 END$$
+
+/* Once a task is inserted or updated, create the email alert for it */
+DROP TRIGGER IF EXISTS trg_create_email_alert_insert;
+DELIMITER $$
+CREATE TRIGGER trg_create_email_alert_insert
+   AFTER INSERT ON task
+   FOR EACH ROW
+BEGIN
+    CALL proc_create_email_alert(NEW.project_id, NEW.id, NEW.end, 0);
+    CALL proc_create_email_alert(NEW.project_id, NEW.id, (NEW.end - INTERVAL 3 DAY), 1);
+    IF NEW.complete = 1 THEN
+        CALL proc_create_email_alert(NEW.project_id, NEW.id, NEW.end, 2);
+    END IF;
+END$$
+
+DROP TRIGGER IF EXISTS trg_create_email_alert_update;
+DELIMITER $$
+CREATE TRIGGER trg_create_email_alert_update
+   AFTER UPDATE ON task
+   FOR EACH ROW
+BEGIN
+    IF NEW.end <> OLD.end THEN
+        CALL proc_create_email_alert(NEW.project_id, NEW.id, NEW.end, 0);
+        CALL proc_create_email_alert(NEW.project_id, NEW.id, (NEW.end - INTERVAL 3 DAY), 1);
+    END IF;
+    IF OLD.complete != NEW.complete AND NEW.complete = 1 THEN
+        CALL proc_create_email_alert(NEW.project_id, NEW.id, (NOW() + INTERVAL 30 SECOND), 2);
+    END IF;
+END$$
+
+DROP PROCEDURE IF EXISTS proc_create_email_alert;
+DELIMITER $$
+CREATE PROCEDURE proc_create_email_alert(IN project_id INT, IN task_id INT, IN alert_time DATETIME, IN alert_type INT)
+BEGIN
+    delete from task_email_alerts where project_id = project_id AND task_id = task_id AND `type` = alert_type;
+    IF(alert_time >= NOW()) THEN
+        insert into task_email_alerts (`project_id`, `task_id`, `when`, `type`) values (project_id, task_id, alert_time, alert_type);
+    END IF;
+END;
+$$
 
 
 

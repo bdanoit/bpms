@@ -9,6 +9,25 @@ class ManagerTask extends Manager{
     
     protected $table = 'task';
     
+    /**
+     * Takes milestone start and end timestamp as parameters
+     */
+    public final function listByProjectMilestone($project_id, $start, $end, $complete = 0){
+        $complete = $complete ? "AND complete = $complete" : '';
+        $start = date('Y-m-d H:i:s', $start);
+        $end = date('Y-m-d H:i:s', $end);
+        $SQL = <<<SQL
+        SELECT * FROM
+            $this->table
+        WHERE project_id = $project_id 
+        AND end BETWEEN '$start' AND '$end' 
+        AND start >= '$start' 
+        $complete
+        ORDER BY end ASC, start DESC
+SQL;
+        return $this->fetch_many($SQL);
+    }
+    
     public final function listByProjectUser($project_id, $user_id, $complete = 0, $prepare = true){
         $SQL = <<<SQL
         SELECT * FROM

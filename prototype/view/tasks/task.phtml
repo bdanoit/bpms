@@ -58,12 +58,17 @@
 
     <div class="btn-group btn-group-margin">
         <?if($task->assigned_to_me()):?>
-        <a class="btn btn-default btn-md" href="<?=router::URL("/*id/tasks/log/$task->id/add");?>"><span class="glyphicon glyphicon-time"></span> Log time</a>
+        <a class="btn btn-default btn-md" href="<?=router::URL("/*id/tasks/log/$task->id/add");?>" title="Log time"><span class="glyphicon glyphicon-time"></span> Log time</a>
         <?endif;?>
         <?if(auth::check("edit")):?>
-        <a class="btn btn-default btn-md" href="<?=router::URL("/*id/tasks/edit/$task->id");?>"><span class="glyphicon glyphicon-pencil"></span> Edit</a>
+        <a class="btn btn-default btn-md" href="<?=router::URL("/*id/tasks/edit/$task->id");?>" title="Edit"><span class="glyphicon glyphicon-pencil"></span></a>
+        <?if(!$task->complete):?>
+        <a class="btn btn-default btn-md" href="<?=router::URL("/*id/tasks/task-complete/$task->id");?>" title="Mark as complete"><span class="glyphicon glyphicon-thumbs-up"></span></a>
+        <?else:?>
+        <a class="btn btn-default btn-md" href="<?=router::URL("/*id/tasks/task-incomplete/$task->id");?>" title="Re-open task"><span class="glyphicon glyphicon-folder-open"></span></a>
+        <?endif;?>
         <?if(auth::check("remove")):?>
-        <a class="btn btn-danger btn-md" href="<?=router::URL("/*id/tasks/remove/$task->id");?>" onclick="javascript:return confirm('Are you sure you want to remove &quot;<?=$task->name;?>&quot;?');"><span class="glyphicon glyphicon-trash"></span> Remove</a>
+        <a class="btn btn-danger btn-md" href="<?=router::URL("/*id/tasks/remove/$task->id");?>" title="Remove" onclick="javascript:return confirm('Are you sure you want to remove &quot;<?=$task->name;?>&quot;?');"><span class="glyphicon glyphicon-trash"></span></a>
         <?endif;?>
         <?endif;?>
     </div>
@@ -80,7 +85,7 @@
         <?if($task->assigned_to()):?>
         <div class="panel-body">
             <?foreach($task->assigned_to() as $i => $user):?>
-            <a href="<?=router::URL("/*id/members/view/{$user->id}");?>" class="btn btn-med <?if($task->assigned_to_me()):?>btn-primary<?else:?>btn-default<?endif;?>"><?=$user->name;?></a>
+            <a href="<?=router::URL("/*id/members/view/{$user->id}");?>" class="btn btn-med <?if(auth::user()->id == $user->id):?>btn-primary<?else:?>btn-default<?endif;?>"><?=$user->name;?></a>
             <?endforeach;?>
         </div>
         <?endif;?>

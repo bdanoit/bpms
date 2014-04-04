@@ -211,7 +211,7 @@ abstract class Manager{
         return $this->fetch_many("SELECT * FROM $this->table $order", NULL, $prepare);
 	}
     
-    protected function fetch_single($SQL, $data, $prepare = true){
+    protected function fetch_single($SQL, $data = NULL, $prepare = true){
         # execute statement
         $stmt = $this->DBH->prepare($SQL);
         if(!$stmt->execute($data)) return false;
