@@ -297,6 +297,9 @@
     this.velocityY = this.prevYPos = 0;
     this.xpos = clientX;
     this.ypos = clientY;
+    if ($.isFunction(this.settings.started)){
+      this.settings.started.call(this);
+    }
   };
 
   Kinetic.prototype._resetMouse = function (){

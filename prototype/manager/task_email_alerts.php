@@ -10,6 +10,9 @@ class ManagerTaskEmailAlerts extends Manager{
         $row->end_pretty = date('F j, Y \a\t h:ia', $end);
     }
     
+    /**
+     * Finds email alerts what are older than NOW (Query 4a)
+     */
     public final function listOlder($timestamp = NULL){
         if(!$timestamp) $timestamp = time();
         $time = date('Y-m-d H:i:s', $timestamp);

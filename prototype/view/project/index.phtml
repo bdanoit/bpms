@@ -4,9 +4,9 @@
 
 <?if($milestones):?>
 <div class="bpms-milestones btn-group">
-    <a class="btn btn-sm btn-default<?if(!$current_ms):?> active<?endif;?>" href="<?=router::URL("/*id/index/all");?>">All</a>
+    <a class="btn btn-md btn-default<?if(!$current_ms):?> active<?endif;?>" href="<?=router::URL("/*id/index/all");?>">All</a>
     <?foreach($milestones as $milestone):?>
-    <a class="btn btn-sm btn-default<?if($current_ms->id == $milestone->id):?> active<?endif;?>" href="<?=router::URL("/*id/index/$milestone->id");?>"><?=$milestone->name;?></a>
+    <a class="btn btn-md btn-default<?if($current_ms->id == $milestone->id):?> active<?endif;?>" href="<?=router::URL("/*id/index/$milestone->id");?>"><?=$milestone->name;?></a>
     <?endforeach;?>
 </div>
 <?endif;?>

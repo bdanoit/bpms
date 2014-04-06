@@ -29,7 +29,7 @@
                         <?if($task->complete):?>
                         <a class="btn btn-default btn-xs align-right<?if(auth::check("edit")):?>" href="<?=router::URL("/*id/tasks/task-incomplete/$task->id");?>"<?else:?> disabled"<?endif;?> title="Re-open"><span class="glyphicon glyphicon-folder-open"></span></a>
                         <?else:?>
-                        <a class="btn btn-default btn-xs align-right<?if(auth::check("edit")):?>" href="<?=router::URL("/*id/tasks/task-complete/$task->id");?>"<?else:?> disabled"<?endif;?> title="Mark as complete"><span class="glyphicon glyphicon-thumbs-up"></span></a>
+                        <a class="btn btn-default btn-xs align-right<?if(auth::check("edit")):?>" href="<?=router::URL("/*id/tasks/task-complete/$task->id");?>"<?else:?> disabled"<?endif;?> title="Mark as complete"><span class="glyphicon glyphicon-ok"></span></a>
                         <?endif;?>
                         <a class="btn btn-default btn-xs align-right<?if(auth::check("remove")):?>" href="<?=router::URL("/*id/tasks/remove/$task->id");?>"<?else:?> disabled"<?endif;?> title="Remove" onclick="javascript:return confirm('Are you sure you want to remove &quot;<?=$task->name;?>&quot;?');"><span class="glyphicon glyphicon-trash"></span></a>
                     </div>

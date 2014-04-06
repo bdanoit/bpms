@@ -63,7 +63,7 @@
         <?if(auth::check("edit")):?>
         <a class="btn btn-default btn-md" href="<?=router::URL("/*id/tasks/edit/$task->id");?>" title="Edit"><span class="glyphicon glyphicon-pencil"></span></a>
         <?if(!$task->complete):?>
-        <a class="btn btn-default btn-md" href="<?=router::URL("/*id/tasks/task-complete/$task->id");?>" title="Mark as complete"><span class="glyphicon glyphicon-thumbs-up"></span></a>
+        <a class="btn btn-default btn-md" href="<?=router::URL("/*id/tasks/task-complete/$task->id");?>" title="Mark as complete"><span class="glyphicon glyphicon-ok"></span></a>
         <?else:?>
         <a class="btn btn-default btn-md" href="<?=router::URL("/*id/tasks/task-incomplete/$task->id");?>" title="Re-open task"><span class="glyphicon glyphicon-folder-open"></span></a>
         <?endif;?>

@@ -63,8 +63,8 @@ class ControllerTasks extends Controller
         if($data = $_POST){
             $data['project_id'] = $project_id;
             $data['creator_id'] = auth::user()->id;
-            if(run()->manager->task->insert($data)){
-                util::Redirect(router::URL("/*id/tasks/all"));
+            if($id = run()->manager->task->insert($data)){
+                util::Redirect(router::URL("/*id/tasks/view/$id"));
             }
         }
         
@@ -115,7 +115,7 @@ class ControllerTasks extends Controller
             $data['project_id'] = $project_id;
             $data['id'] = $task_id;
             if(run()->manager->task->update($data)){
-                util::Redirect(router::URL("/*id/tasks/all"));
+                util::Redirect(router::URL("/*id/tasks/view/$task_id"));
             }
         }
         

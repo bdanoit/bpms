@@ -143,6 +143,32 @@ td.align-right{
 }
 .bpms-milestones{
     padding-bottom: 5px;
+    padding-right: 10px;
+}
+.bpms-canvas{
+    border: 2px solid #ccc;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+.bpms-canvas-header{
+    position: relative;
+    left: 0;
+}
+.bpms-canvas-data{
+    max-height: 400px;
+    overflow: auto;
+    position: relative;
+}
+.bpms-canvas canvas{
+    vertical-align: bottom;
+}
+.bpms-popover-container{
+    position: absolute;
+}
+.bpms-canvas-controls{
+}
+.bpms-canvas-controls div.checkbox-inline{
 }
 
 

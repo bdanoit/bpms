@@ -35,8 +35,8 @@ class ControllerMilestone extends Controller
     
     public function remove($project_id, $action, $id){
         _global()->title = "Remove milestone";
-        if(run()->manager->milestone->deleteBy(array("project_id"=>$project_id,"user_id"=>$user_id)))
-            util::Redirect(router::URL("/*id/list"));
+        if(run()->manager->milestone->deleteBy(array("project_id"=>$project_id,"id"=>$id)))
+            util::Redirect(router::URL("/*id/milestone"));
         return view()->project->error();
     }
     

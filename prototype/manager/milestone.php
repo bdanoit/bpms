@@ -1,6 +1,7 @@
 <?php
 class ManagerMilestone extends Manager{
     protected $table = 'phase';
+    protected $orderBy = array("end"=>"ASC");
     
 	protected final function prepare(&$row){
         $end = $row->end = strtotime($row->end);
