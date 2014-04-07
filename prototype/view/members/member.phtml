@@ -1,0 +1,51 @@
+<?if($errors):?>
+<div class="alert alert-danger">
+    <ul>
+        <?foreach($errors as $error):?>
+        <li><?=$error->message;?></li>
+        <?endforeach;?>
+    </ul>
+</div>
+<?endif;?>
+<?if($member):?>
+
+<blockquote>Details for <strong><?=$member->name;?></strong></blockquote>
+
+<div class="row">
+
+<div class="col-sm-6">
+<ul class="list-group">
+    <li class="list-group-item">Email: <strong><?=$member->email;?></strong></li>
+    <li class="list-group-item"><span class="badge"><?=$member->no_logged;?></span> Tasks worked on</li>
+    <li class="list-group-item"><span class="badge"><?=$member->no_complete;?></span> Tasks complete</li>
+    <li class="list-group-item"><span class="badge"><?=$member->no_left;?></span> Tasks left</li>
+    <li class="list-group-item"><span class="badge"><?=$member->no_tasks;?></span> Total tasks</li>
+    <li class="list-group-item"><span class="badge"><?=round($member->time_logged / 3600);?>h <?=round($member->time_logged % 3600 / 60);?>m</span> Hours logged</li>
+</ul>
+<?if($tasks):?>
+<ul class="list-group">
+    <li class="list-group-item"><strong>Current tasks</strong></li>
+    <?foreach($tasks as $task):?>
+    <li class="list-group-item"><?if($task->time_logged):?><span class="badge"><?=round($task->time_logged / 3600);?>h <?=round($task->time_logged % 3600 / 60);?>m</span><?endif;?><a href="<?=router::URL("/*id/tasks/view/$task->id");?>"><?=$task->name;?></a></li>
+    <?endforeach;?>
+</ul>
+<?endif;?>
+</div>
+
+
+<?if($tasks_complete):?>
+<div class="col-sm-6">
+<ul class="list-group">
+    <li class="list-group-item"><strong>Complete tasks</strong></li>
+    <?foreach($tasks_complete as $task):?>
+    <li class="list-group-item"><?if($task->time_logged):?><span class="badge"><?=round($task->time_logged / 3600);?>h <?=round($task->time_logged % 3600 / 60);?>m</span><?endif;?><a href="<?=router::URL("/*id/tasks/view/$task->id");?>"><?=$task->name;?></a></li>
+    <?endforeach;?>
+</ul>
+</div>
+<?endif;?>
+
+</div>
+
+<?else:?>
+<p>Member could not be found</p>
+<?endif;?>

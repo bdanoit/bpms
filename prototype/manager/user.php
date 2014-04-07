@@ -147,6 +147,56 @@ SQL;
 SQL;
         return $this->fetch_single($SQL, $params);
     }
+    
+    /**
+     * Find a user by the project they belong to
+     */
+    public final function findByProject($project_id, $user_id){
+        $SQL = <<<SQL
+SELECT 
+    u.id, 
+    u.name, 
+    u.email, 
+    a.no_tasks, 
+    a.no_complete, 
+    l.no_logged, 
+    l.time_logged,
+    a.no_tasks - a.no_complete as no_left 
+        FROM user u 
+        RIGHT JOIN project_permission p ON u.id = p.user_id
+        LEFT JOIN (SELECT user_id, project_id, COUNT(task_id) AS no_tasks, SUM(complete) AS no_complete FROM task_assigned_to a1 LEFT JOIN (SELECT id, complete FROM task) t1 ON a1.task_id = t1.id WHERE project_id = $project_id GROUP BY user_id) a ON u.id = a.user_id 
+        LEFT JOIN (SELECT user_id, project_id, COUNT(id) AS no_logged, SUM(TIMESTAMPDIFF(SECOND, start, end)) AS time_logged FROM task_log WHERE project_id = $project_id GROUP BY user_id) l ON l.project_id = a.project_id AND l.user_id = a.user_id 
+        WHERE p.project_id = $project_id AND u.id = $user_id
+SQL;
+        return $this->fetch_single($SQL, NULL);
+    }
+    
+    /**
+     * Get statistics for every user in a given project
+     */
+    public final function stats($project_id, array $order = array()){
+        if(!$order){
+            $order = array("time_logged"=>"DESC");
+        }
+        $order_sql = $this->arr_to_string($order, ',', '`$k` $v');
+        $SQL = <<<SQL
+SELECT 
+    u.id, 
+    u.name, 
+    u.email, 
+    a.no_tasks, 
+    a.no_complete, 
+    l.no_logged, 
+    l.time_logged,
+    a.no_tasks - a.no_complete as no_left 
+        FROM user u 
+        RIGHT JOIN (SELECT user_id, project_id, COUNT(task_id) AS no_tasks, SUM(complete) AS no_complete FROM task_assigned_to a1 LEFT JOIN (SELECT id, complete FROM task) t1 ON a1.task_id = t1.id WHERE project_id = $project_id GROUP BY user_id) a ON u.id = a.user_id 
+        LEFT JOIN (SELECT user_id, project_id, COUNT(id) AS no_logged, SUM(TIMESTAMPDIFF(SECOND, start, end)) AS time_logged FROM task_log WHERE project_id = $project_id GROUP BY user_id) l ON l.project_id = a.project_id AND l.user_id = a.user_id 
+        GROUP BY u.id 
+        ORDER BY $order_sql
+SQL;
+        return $this->fetch_many($SQL);
+    }
 	
 	protected final function prepare(&$row){
 		$row->alias = $row->name ? $row->name : $row->email;

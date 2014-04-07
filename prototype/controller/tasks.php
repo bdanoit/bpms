@@ -33,8 +33,9 @@ class ControllerTasks extends Controller
         return $this->view->index(array(
 		    "project"=>$this->project,
             "data"=>$data,
-		    "tasks"=>run()->manager->task->listByProjectUser($this->project->id, auth::user()->id),
-            "message"=>"No tasks assigned to you."
+		    "tasks"=>run()->manager->task->listByProjectUser($this->project->id, auth::user()->id, 0, $_GET),
+            "message"=>"No tasks assigned to you.",
+            "get"=>$_GET ? (object)$_GET : NULL
 		));
     }
     
@@ -43,8 +44,9 @@ class ControllerTasks extends Controller
         return $this->view->index(array(
 		    "project"=>$this->project,
             "data"=>$data,
-		    "tasks"=>run()->manager->task->listByProjectUser($this->project->id, auth::user()->id, 1),
-            "message"=>"No finished tasks."
+		    "tasks"=>run()->manager->task->listByProjectUser($this->project->id, auth::user()->id, 1, $_GET),
+            "message"=>"No finished tasks.",
+            "get"=>$_GET ? (object)$_GET : NULL
 		));
     }
     
@@ -53,8 +55,9 @@ class ControllerTasks extends Controller
         return $this->view->index(array(
 		    "project"=>$this->project,
             "data"=>$data,
-		    "tasks"=>run()->manager->task->listBy(array("project_id"=>$this->project->id)),
-            "message"=>"No tasks."
+		    "tasks"=>run()->manager->task->listByProject($this->project->id, NULL, $_GET),
+            "message"=>"No tasks.",
+            "get"=>$_GET ? (object)$_GET : NULL
 		));
     }
     

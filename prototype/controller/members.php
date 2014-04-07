@@ -27,10 +27,29 @@ class ControllerMembers extends Controller
 		));
     }
     
+    public function stats($project_id, $action){
+        _global()->title = "Member Statistics";
+        $stats = run()->manager->user->stats($project_id, $_GET);
+        return $this->view->stats(array(
+		    "project"=>$this->project,
+            "stats"=>$stats,
+            "get"=>$_GET ? (object)$_GET : NULL
+		));
+    }
+    
     public function view($project_id, $action, $user_id){
-        $user = run()->manager->user->findBy(array("id"=>$user_id));
-        _global()->title = $user->name;
-        return "Coming soon...";
+        $user = run()->manager->user->findByProject($project_id, $user_id);
+        _global()->title = 'Member information';
+        if($user){
+            $tasks = run()->manager->task->listByProjectUser($project_id, $user_id);
+            $tasks_complete = run()->manager->task->listByProjectUser($project_id, $user_id, 1);
+        }
+        return $this->view->member(array(
+		    "project"=>$this->project,
+            "member"=>$user,
+            "tasks"=>$tasks,
+            "tasks_complete"=>$tasks_complete
+		));
     }
     
     public function remove($project_id, $action, $user_id){

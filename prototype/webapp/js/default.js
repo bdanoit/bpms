@@ -1,3 +1,22 @@
+
+
+//Overview navigation
+(function(window){
+
+    // Bind to StateChange Event
+    History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
+        var state = History.getState(); // Note: We are using History.getState() instead of event.state
+        $.post("/project/"+overview.project_id+"/index-json", state, function(result) {
+            $('#bpms_overview').each(function(){
+                overview.result = result;
+                overview.wrapper = $('#bpms_wrapper');
+                overview.draw(result.data);
+            });
+        });
+    });
+
+})(window);
+
 $(document).ready(function(){
     
     // enable autocomplete
@@ -79,24 +98,6 @@ $(document).ready(function(){
     });
 });
 
-//Overview navigation
-(function(window){
-
-    // Bind to StateChange Event
-    History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
-        var state = History.getState(); // Note: We are using History.getState() instead of event.state
-
-        $.post("/project/"+overview.project_id+"/index-json", state, function(result) {
-            $('#bpms_overview').each(function(){
-                overview.result = result;
-                overview.wrapper = $('#bpms_wrapper');
-                overview.draw(result.data);
-            });
-        });
-    });
-
-})(window);
-
 serialize = function(obj) {
   var str = [];
   for(var p in obj)
@@ -121,9 +122,13 @@ var overview = {
         canvas.attr('height', 0);
         heading.attr('width', 0);
         heading.attr('height', 0);
+        this.wrapper.prepend('<blockquote class="no-tasks alert-danger">No tasks found</blockquote>');
+        this.wrapper.find('canvas').hide();
     },
     draw: function (data, pxd){
         if(!data || !data.length) return this.clear();
+        this.wrapper.find('.no-tasks').remove();
+        this.wrapper.find('canvas').show();
         var wrapper = this.wrapper;
         var result = this.result;
         var canvas = wrapper.find('#bpms_overview');
@@ -135,7 +140,7 @@ var overview = {
         
         //data from db
         var s_in_day = 86400;
-        var num_rows = data.length;
+        var num_rows = (data.length > 10) ? data.length : 10;
         var start = result.start;
         var end = result.end;
         var first_day_i = result.first_day_i;
@@ -143,7 +148,7 @@ var overview = {
         var first_day_s = result.first_day_s;
         var elapsed = end-start;
         var num_months = result.num_months;
-        var num_days = result.num_days;
+        var num_days = (result.num_days > 31) ? result.num_days : 31;
         
         //pixel data
         var pxd = pxd ? pxd : 40; //pixels per day square
@@ -303,7 +308,9 @@ var overview = {
                             container:'body',
                             animation:false
                         }).popover('show');
-                        $('div.popover').css({left:event.pageX - $('div.popover').width()/2});
+                        var med = (coords.x2-coords.x1) / 2 + coords.x1 + elem_offset.left - parent.scrollLeft();
+                        var left = Math.round((med - event.pageX) / 4);
+                        $('div.popover').css({left:event.pageX - $('div.popover').width()/2 + left});
                     }
                 }
                 else if(in_task[i]){

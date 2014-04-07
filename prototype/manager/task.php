@@ -28,15 +28,44 @@ SQL;
         return $this->fetch_many($SQL);
     }
     
-    public final function listByProjectUser($project_id, $user_id, $complete = 0, $prepare = true){
+    public final function listByProject($project_id, $complete = 0, array $order = array(), $prepare = true){
+        if(!$order){
+            $order = array("end"=>"ASC");
+        }
+        $order_sql = $this->arr_to_string($order, ',', '`$k` $v');
+        if($complete !== NULL){
+            $cmp_sql = "AND t.complete = $complete ";
+        }
         $SQL = <<<SQL
-        SELECT * FROM
-            $this->table
-        WHERE
-            complete = $complete
-        AND
-            id IN (SELECT task_id FROM task_assigned_to WHERE project_id = $project_id AND user_id = $user_id)
-        ORDER BY end ASC, start DESC
+        SELECT t.*, SUM(l.time_logged) AS time_logged
+        FROM task t 
+        LEFT JOIN (SELECT TIMESTAMPDIFF(SECOND, start, end) AS time_logged, task_id FROM task_log WHERE project_id = $project_id) l ON l.task_id = t.id
+        WHERE t.project_id = $project_id 
+        $cmp_sql 
+        GROUP BY t.id 
+        ORDER BY $order_sql 
+SQL;
+        return $this->fetch_many($SQL);
+    }
+    
+    public final function listByProjectUser($project_id, $user_id, $complete = 0, array $order = array(), $prepare = true){
+        if(!$order){
+            $order = array("end"=>"ASC");
+        }
+        $order_sql = $this->arr_to_string($order, ',', '`$k` $v');
+        if($complete !== NULL){
+            $cmp_sql = "AND t.complete = $complete ";
+        }
+        $SQL = <<<SQL
+        SELECT t.*, SUM(l.time_logged) AS time_logged
+        FROM task t 
+        RIGHT JOIN task_assigned_to a ON t.id = a.task_id
+        LEFT JOIN (SELECT TIMESTAMPDIFF(SECOND, start, end) AS time_logged, task_id FROM task_log WHERE project_id = $project_id AND user_id = $user_id) l ON l.task_id = t.id
+        WHERE a.user_id = $user_id 
+        AND t.project_id = $project_id 
+        $cmp_sql
+        GROUP BY t.id 
+        ORDER BY $order_sql 
 SQL;
         return $this->fetch_many($SQL);
     }
@@ -130,6 +159,9 @@ SQL;
         return true;
     }
     
+    /**
+     * Convienience handling of manager exceptions
+     */
     protected function handle_exception(ManagerException $exc){
         if($exc->getCode() == 1048){
             $message = $this->fetch_single('SELECT get_last_custom_error() AS err', NULL, false);
@@ -195,6 +227,9 @@ SQL;
                 }
             }
         };
+        if($row->time_logged){
+            $row->time_pretty = round($row->time_logged / 3600).'h '.round($row->time_logged % 3600 / 60).'m';
+        }
         $start = $row->start = strtotime($row->start);
         $end = $row->end = strtotime($row->end);
         $now = time();

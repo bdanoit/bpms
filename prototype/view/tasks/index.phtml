@@ -12,8 +12,9 @@
         <table class="table table-striped">
             <thead>
             <tr>
-                <th>Name</th>
-                <th>Due</th>
+                <th><a href="?name=<?if($get->name=="desc"):?>asc<?else:?>desc<?endif;?>">Name<?if($get->name):?><span class="glyphicon glyphicon-arrow-<?if($get->name=="asc"):?>up<?else:?>down<?endif;?>"></span><?endif;?></a></th>
+                <th><a href="?end=<?if($get->end=="desc"):?>asc<?else:?>desc<?endif;?>">Due<?if(!$get || $get->end):?><span class="glyphicon glyphicon-arrow-<?if($get->end=="desc"):?>down<?else:?>up<?endif;?>"></span><?endif;?></a></th>
+                <th><a href="?time_logged=<?if($get->time_logged=="desc"):?>asc<?else:?>desc<?endif;?>">Time logged<?if($get->time_logged):?><span class="glyphicon glyphicon-arrow-<?if($get->time_logged=="asc"):?>up<?else:?>down<?endif;?>"></span><?endif;?></a></th>
                 <th class="align-right">Tools</th>
             </tr>
             </thead>
@@ -22,6 +23,7 @@
                 <tr class="<?if($task->complete):?>success<?elseif($task->is_late):?>danger<?elseif($task->is_due_soon):?>warning<?endif;?>">
                     <td><a href="<?=router::URL("/*id/tasks/view/$task->id");?>"><?=$task->name;?></a></td>
                     <td><?=$task->end_pretty;?></td>
+                    <td><?=$task->time_pretty;?></td>
                     <td class="align-right">
                     <div class="btn-group">
                         <a class="btn btn-default btn-xs align-right<?if($task->assigned_to_me()):?>" href="<?=router::URL("/*id/tasks/log/$task->id/add");?>"<?else:?> disabled"<?endif;?> title="Log time"><span class="glyphicon glyphicon-time"></span></a>

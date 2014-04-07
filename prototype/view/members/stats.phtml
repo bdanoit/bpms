@@ -1,0 +1,43 @@
+<?if($errors):?>
+<div class="alert alert-danger">
+    <ul>
+        <?foreach($errors as $error):?>
+        <li><?=$error->message;?></li>
+        <?endforeach;?>
+    </ul>
+</div>
+<?endif;?>
+<?if($stats):?>
+<blockquote>Statistics for <strong><?=$project->name;?></strong> members</blockquote>
+<div class="table-responsive">
+    <table class="table table-hover">
+    <thead>
+        <tr>
+            <th><a href="?name=<?if($get->name=="desc"):?>asc<?else:?>desc<?endif;?>">Alias<?if(!$get || $get->name):?><span class="glyphicon glyphicon-arrow-<?if($get->name=="asc"):?>up<?else:?>down<?endif;?>"></span><?endif;?></a></th>
+            <th><a href="?no_tasks=<?if($get->no_tasks=="desc"):?>asc<?else:?>desc<?endif;?>"># tasks<?if($get->no_tasks):?><span class="glyphicon glyphicon-arrow-<?if($get->no_tasks=="asc"):?>up<?else:?>down<?endif;?>"></span><?endif;?></a></th>
+            <th><a href="?no_logged=<?if($get->no_logged=="desc"):?>asc<?else:?>desc<?endif;?>"># tasks worked on<?if($get->no_logged):?><span class="glyphicon glyphicon-arrow-<?if($get->no_logged=="asc"):?>up<?else:?>down<?endif;?>"></span><?endif;?></a></th>
+            <th><a href="?no_complete=<?if($get->no_complete=="desc"):?>asc<?else:?>desc<?endif;?>"># tasks complete<?if($get->no_complete):?><span class="glyphicon glyphicon-arrow-<?if($get->no_complete=="asc"):?>up<?else:?>down<?endif;?>"></span><?endif;?></a></th>
+            <th><a href="?no_left=<?if($get->no_left=="desc"):?>asc<?else:?>desc<?endif;?>"># tasks left<?if($get->no_left):?><span class="glyphicon glyphicon-arrow-<?if($get->no_left=="asc"):?>up<?else:?>down<?endif;?>"></span><?endif;?></a></th>
+            <th><a href="?time_logged=<?if($get->time_logged=="desc"):?>asc<?else:?>desc<?endif;?>">Hours logged<?if($get->time_logged):?><span class="glyphicon glyphicon-arrow-<?if($get->time_logged=="asc"):?>up<?else:?>down<?endif;?>"></span><?endif;?></a></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?foreach($stats as $member):?>
+        <tr>
+            <td><a href="<?=router::URL("/*id/members/view/$member->id");?>"><?=$member->name;?></a></td>
+            <td><?=$member->no_tasks;?></td>
+            <td><?=$member->no_logged;?></td>
+            <td><?=$member->no_complete;?></td>
+            <td><?=$member->no_left;?></td>
+            <td>
+                <?=round($member->time_logged / 3600);?>h
+                <?=round($member->time_logged % 3600 / 60);?>m
+            </td>
+        </tr>
+        <?endforeach;?>
+    </tbody>
+</table>
+</div>
+<?else:?>
+<p>There is not enough data for statistics to be available.</p>
+<?endif;?>
