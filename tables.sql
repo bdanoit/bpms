@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS permission;
 DROP TABLE IF EXISTS task;
 DROP TABLE IF EXISTS phase;
 DROP TABLE IF EXISTS project;
+DROP TABLE IF EXISTS user_verify;
 DROP TABLE IF EXISTS user;
 
 CREATE TABLE user(
@@ -12,6 +13,33 @@ CREATE TABLE user(
     password char(32) not null,
     email char(128) unique not null
 )ENGINE=InnoDB CHARACTER SET=utf8;
+
+CREATE TABLE `sessions` (
+  `hash` varchar(32) NOT NULL,
+  `user_id` varchar(64) DEFAULT '',
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`hash`),
+  INDEX (`user_id`),
+  INDEX (`created`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `user_verify` (
+  `hash` varchar(32) NOT NULL,
+  `user_id` int not null references user(id) on delete cascade,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`hash`),
+  INDEX (`user_id`),
+  INDEX (`created`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `user_forgot` (
+  `hash` varchar(32) NOT NULL,
+  `user_id` int not null references user(id) on delete cascade,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`hash`),
+  INDEX (`user_id`),
+  INDEX (`created`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE project(
     id int primary key auto_increment,

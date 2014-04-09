@@ -42,21 +42,18 @@ class ControllerCron extends Controller
             }
             
             if($message){
-                $mail             = new PHPMailer();
-
-                $body             = $message;
-
+                $mail = new PHPMailer();
+                $body = $message;
                 $mail->IsSMTP();
-                $mail->SMTPDebug  = 2;
-                $mail->SMTPAuth   = true;
+                $mail->SMTPAuth = true;
                 $mail->SMTPSecure = "tls";
-                $mail->Host       = "smtp.gmail.com";
-                $mail->Port       = 587;
-                $mail->Username   = "bdanoit@gmail.com";
-                $mail->Password   = "safe1danoit2";
+                $mail->Host = "smtp.gmail.com";
+                $mail->Port = 587;
+                $mail->Username = "bpms@danoit.com";
+                $mail->Password = "safe1belize2";
 
-                $mail->SetFrom('bdanoit@gmail.com', 'BPMS');
-                $mail->AddReplyTo("bdanoit@gmail.com","BPMS");
+                $mail->SetFrom('bpms@danoit.com', 'BPMS');
+                $mail->AddReplyTo("no-reply@danoit.com","no reply");
                 $mail->Subject = $title;
                 $mail->AltBody = "You must enable HTML emails to see this message...";
                 $mail->MsgHTML($body);

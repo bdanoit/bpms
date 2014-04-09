@@ -1,0 +1,27 @@
+<div class="jumbotron">
+    <?if($errors):?>
+    <div class="alert alert-danger">
+        <ul>
+            <?foreach($errors as $error):?>
+            <li><?=$error->message;?></li>
+            <?endforeach;?>
+        </ul>
+    </div>
+    <?endif;?>
+    <h1>Contact us</h1>
+    <form class="form-settings" method="post" role="form">
+    <div class="form-group">
+        <?if($user):?>
+        <p class="lead">A response will be sent to <strong><?=$user->email;?></strong></p>
+        <?else:?>
+        <label>Your email</label>
+        <input type="email" class="form-control" name="email" placeholder="Email" value="<?=$post->email;?>">
+        <?endif;?>
+    </div>
+    <div class="form-group">
+        <textarea class="form-control" rows="10" name="message" placeholder="What do you have to say?"><?=$post->message;?></textarea>
+    </div>
+        <input type="submit" class="btn btn-lg btn-primary" value="Send">
+        <a class="btn btn-lg btn-danger" href="<?=http::last();?>" role="button">Cancel</a>
+    </form>
+</div>

@@ -3,6 +3,10 @@ body {
   padding-top: 70px;
   padding-bottom: 20px;
 }
+p.inline{
+    display: inline;
+    padding: 0.3em;
+}
 
 a.navbar-brand{
     height: 0px;

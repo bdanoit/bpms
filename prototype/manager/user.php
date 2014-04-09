@@ -99,13 +99,52 @@ SQL;
 			);
 			return;
 		}
-		$params["password"] = $password[0];//string::bhash_md5($password[0]);
-		$result = parent::insert($params);
+		$params["password"] = $password[0];
+        
+        //start transaction
+        $this->DBH->beginTransaction();
+        
+        //insert new user
+        try{
+            $result = parent::insert($params);
+        }
+        catch(ManagerException $exc){
+            $this->handle_exception($exc);
+            $this->DBH->rollback();
+            return false;
+        }
+        
+        //insert record and email user
+        try{
+            $hash = string::bhash_md5($params['name'].time().rand(1,1048576));
+            $user_id = $this->DBH->lastInsertId();
+            run()->manager->user_verify->insert(array(
+                "hash"=>$hash,
+                "user_id"=>$user_id
+            ));
+        }
+        catch(ManagerException $exc){
+            $this->handle_exception($exc);
+            $this->DBH->rollback();
+            return false;
+        }
+        
+        //email user activation url
+        try{
+            $this->send_verify_email($params['email'], $hash);
+        }
+        catch(ManagerException $exc){
+            $this->handle_exception($exc);
+            $this->DBH->rollback();
+            return false;
+        }
+        
+        $this->DBH->commit();
 		return $result;
 	}
 	
 	public final function tryLogin(array $data){
-		$user = $this->findByUsernameOrEmail($data);
+		$user = $this->findByNameOrEmailWPass($data);
 		if(!$user){
 			$GLOBALS["errors"][] = (object)array(
 				"code"=>dechex(0),
@@ -113,6 +152,13 @@ SQL;
 			);
 			return false;
 		}
+        if(!$user->verified){
+			$GLOBALS["errors"][] = (object)array(
+				"code"=>dechex(0),
+				"message"=>"You have not verified your account. Please check your email and follow the instructions provided"
+			);
+            return false;
+        }
 		$hash = string::bhash_md5($user->email.time().rand(1,1048576));
 		$session = run()->manager->session->deleteBy(array(
 			"hash"=>$hash
@@ -134,7 +180,7 @@ SQL;
 		return true;
 	}
     
-    public final function findByUsernameOrEmail(array $data, $prepare = true){
+    public final function findByNameOrEmailWPass(array $data, $prepare = true){
         $params = array(
             'id'=>$data['name'] ? $data['name'] : $data['email'],
             'password'=>md5($data['password'])
@@ -144,6 +190,18 @@ SQL;
         FROM {$this->table}
         WHERE (name = :id OR email = :id)
         AND password = :password
+SQL;
+        return $this->fetch_single($SQL, $params);
+    }
+    
+    public final function findByNameOrEmail(array $data, $prepare = true){
+        $params = array(
+            'id'=>$data['name'] ? $data['name'] : $data['email']
+        );
+        $SQL = <<<SQL
+        SELECT * 
+        FROM {$this->table}
+        WHERE (name = :id OR email = :id)
 SQL;
         return $this->fetch_single($SQL, $params);
     }
@@ -213,6 +271,170 @@ SQL;
             return false;
         };
 	}
+    
+    /**
+     * Convienience handling of manager exceptions
+     */
+    protected function handle_exception(ManagerException $exc){
+        if($exc->getCode() == 1048){
+            $message = $this->fetch_single('SELECT get_last_custom_error() AS err', NULL, false);
+        }
+        $message = $message ? $message->err : $exc->getMessage();
+        $GLOBALS["errors"][] = (object)array(
+            "code"=>$exc->getCode(),
+            "message"=>$message
+        );
+    }
+    
+    public function findByVerifyHash($hash, $prepare = true){
+        return $this->fetch_single("SELECT u.* FROM user u RIGHT JOIN user_verify v ON u.id = v.user_id WHERE hash = :hash", array("hash"=>$hash), $prepare);
+    }
+    
+    public function findByResetHash($hash, $prepare = true){
+        return $this->fetch_single("SELECT u.* FROM user u RIGHT JOIN user_forgot f ON u.id = f.user_id WHERE hash = :hash", array("hash"=>$hash), $prepare);
+    }
+    
+    public function updatePassword(array $data){
+        
+        //check password
+        $new_password = $data['new_password'];
+        unset($data['new_password']);
+		if($new_password[0] != $new_password[1]){
+			$GLOBALS["errors"][] = (object)array(
+				"code"=>dechex(0),
+				"message"=>"Your new passwords do not match"
+			);
+			return false;
+		}
+		$data["password"] = $new_password[0];
+        
+        //begin transaction
+        $this->DBH->beginTransaction();
+        try{
+            parent::update($data);
+            run()->manager->userForgot->deleteBy(array('user_id'=>$data['id']));
+        }
+        catch(ManagerException $exc){
+            $this->handle_exception($exc);
+            $this->DBH->rollback();
+            return false;
+        }
+        $this->DBH->commit();
+        return true;
+    }
+    
+    public function verify($id){
+        $this->DBH->beginTransaction();
+        
+        //Set user as verified
+        try{
+            $this->exec("UPDATE `user` SET verified = 1 WHERE id = $id");
+        }
+        catch(ManagerException $exc){
+            $this->handle_exception($exc);
+            $this->DBH->rollback();
+            return false;
+        }
+        
+        //Delete verified column
+        try{
+            $this->exec("DELETE FROM `user_verify` WHERE user_id = $id");
+        }
+        catch(ManagerException $exc){
+            $this->handle_exception($exc);
+            $this->DBH->rollback();
+            return false;
+        }
+        $this->DBH->commit();
+        return true;
+    }
+    
+    /**
+     * Sends an email to user with activation link (verify)
+     */
+    protected function send_verify_email($email, $hash){
+        return $this->send_email($email, $hash, 'verify');
+    }
+    
+    /**
+     * Sends an email to user with activation link (reset password)
+     */
+    protected function send_reset_email($email, $hash){
+        return $this->send_email($email, $hash, 'reset');
+    }
+    
+    /**
+     * Begin reset password process
+     */
+    public function resetByName($name){
+        $this->DBH->beginTransaction();
+        
+        $user = run()->manager->user->findByNameOrEmail(array("name"=>$name));
+        
+        if(!$user){
+            $GLOBALS['errors'][] = (object)array(
+                "code"=>dechex(0),
+                "message"=>"That username or email was not found."
+            );
+            return false;
+        }
+        
+        $hash = string::bhash_md5($user->name.time().rand(1,1048576));
+        
+        //Set user as verified
+        try{
+            //clean out old entries
+            run()->manager->userForgot->deleteBy(array('user_id'=>$user->id));
+            //insert new entry
+            run()->manager->userForgot->insert(array('user_id'=>$user->id,'hash'=>$hash));
+            $this->send_reset_email($user->email, $hash);
+        }
+        catch(ManagerException $exc){
+            $this->handle_exception($exc);
+            $this->DBH->rollback();
+            return false;
+        }
+        
+        $this->DBH->commit();
+        return $user;
+    }
+    
+    /**
+     * Sends an email to user with activation link
+     */
+    protected function send_email($email, $hash, $type = 'reset'){
+        require_once(LIB_DIR.'/class.phpmailer.php');
+        $body = view()->members->{$type.'_email'}(array(
+            "email"=>$email,
+            "hash"=>$hash
+        ));
+        $mail = new PHPMailer();
+        $mail->IsSMTP();
+        $mail->SMTPAuth = true;
+        $mail->SMTPSecure = "tls";
+        $mail->Host = "smtp.gmail.com";
+        $mail->Port = 587;
+        $mail->Username = "bpms@danoit.com";
+        $mail->Password = "safe1belize2";
+
+        $mail->SetFrom('bpms@danoit.com', 'BPMS');
+        $mail->AddReplyTo('bpms@danoit.com', "BPMS");
+        switch($type){
+            case 'verify': $mail->Subject = "Verify your email - BPMS"; break;
+            case 'reset': $mail->Subject = "Reset your password - BPMS"; break;
+            default: $mail->Subject = "BPMS Mailer";
+        }
+        $mail->AltBody = "You must enable HTML emails to see this message...";
+        $mail->MsgHTML($body);
+
+        $mail->AddAddress($email);
+
+        if(!$mail->Send()) {
+            throw new ManagerException("Mail could not be delivered to recipient ($email)");
+        } else {
+            return true;
+        }
+    }
 	
 	protected function validation(){
 		return array(

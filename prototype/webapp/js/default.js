@@ -18,7 +18,6 @@
 })(window);
 
 $(document).ready(function(){
-    
     // enable autocomplete
     $('.ac-user').each(function(){
         var id = $(this).attr('id').match(/ac_user_pid_(\d+)/);
@@ -140,7 +139,7 @@ var overview = {
         
         //data from db
         var s_in_day = 86400;
-        var num_rows = (data.length > 10) ? data.length : 10;
+        var num_rows = (data.length >= 10) ? data.length : 10;
         var start = result.start;
         var end = result.end;
         var first_day_i = result.first_day_i;

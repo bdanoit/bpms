@@ -1,0 +1,17 @@
+
+<div class="jumbotron">
+    <?if($errors):?>
+    <h1>Oops...</h1>
+    <p class="lead">Your account could not be <strong>verified</strong> at this time...</p>
+    <div class="alert alert-danger">
+        <ul>
+            <?foreach($errors as $error):?>
+            <li><?=$error->message;?></li>
+            <?endforeach;?>
+        </ul>
+    </div>
+    <?else:?>
+    <h1>Success</h1>
+    <p class="lead">Your account has been verified. Please <a href="/">Login</a></p>
+    <?endif;?>
+</div>

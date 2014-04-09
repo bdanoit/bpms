@@ -34,7 +34,10 @@
         <hr>
 
         <footer>
-            <p class="small">&copy; BPMS <?=date('Y');?></p>
+            <div class="row">
+            <div class="col-sm-6"><p class="small">&copy; BPMS <?=date('Y');?></p></div>
+            <div class="col-sm-6"><p align="right" class="small"><a href="/about">About</a> &middot; <a href="/contact">Contact us</a></p></div>
+            </div>
         </footer>
     </div> <!-- /container -->
 
@@ -44,5 +47,6 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="/web/js/bootstrap.min.js"></script>
+    <script src="/web/js/convenience.js"></script>
   </body>
 </html>
