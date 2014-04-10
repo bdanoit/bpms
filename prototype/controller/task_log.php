@@ -2,18 +2,8 @@
 class ControllerTaskLog extends Controller
 {
 	public function __before(){
-        //list of users current projects
-	    if(auth::user()){
-	        _global()->projects = run()->manager->project->listByUser(auth::user()->id);
-	    }
-        
         //current defined router variables
         $vars = router::Current()->vars;
-        
-        //find and store current project
-        _global()->project = $this->project = run()->manager->project->findBy(array(
-            "id"=>$vars->id
-        ));
         
         //find and store current task
         $this->task = run()->manager->task->findBy(array("id"=>$vars->task_id,"project_id"=>$vars->id));
@@ -51,6 +41,7 @@ class ControllerTaskLog extends Controller
 		    "project"=>$this->project,
             "members"=>run()->manager->user->listByProject($project_id),
             "task"=>$task,
+            "log"=>(object)$data,
             "tasks"=>$tasks,
             "submit_name"=>"Add",
             "default"=>$default

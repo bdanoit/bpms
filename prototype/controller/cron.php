@@ -2,6 +2,7 @@
 class ControllerCron extends Controller
 {
 	public function __before(){
+        $this->construct = false;
         header('Content-type: text/plain');
         $this->template = 'blank';
         $this->view = view()->cron;

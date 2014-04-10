@@ -10,7 +10,9 @@
 <?if($task):?>
 <div class="col-sm-8">
     
-    <blockquote><?=$task->description;?></blockquote>
+    <blockquote>
+        <?=$task->description;?>
+    </blockquote>
     
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -77,6 +79,14 @@
     <?else:?>
     <blockquote class="<?if($task->is_late):?>alert-danger<?elseif($task->is_due_soon):?>alert-warning<?else:?>alert-info<?endif;?>">Due <?=$task->end_pretty;?></blockquote>
     <blockquote class="alert-info">Started <?=$task->start_pretty;?></blockquote>
+        <?if($task->estimate):?>
+        <blockquote class="alert-default">
+            Estimated time: 
+            <?if($task->estimate[0]):?><?=$task->estimate[0];?> days<?endif;?>
+            <?if($task->estimate[1]):?><?=$task->estimate[1];?> hours<?endif;?>
+            <?if($task->estimate[2]):?><?=$task->estimate[2];?> mins<?endif;?>
+        </blockquote>
+        <?endif;?>
     <?endif;?>
     <div class="panel panel-default">
         <div class="panel-heading">

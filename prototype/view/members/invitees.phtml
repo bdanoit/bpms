@@ -1,0 +1,46 @@
+        <?if($invitees):?>
+        <blockquote>Here's a list of invitees.</blockquote>
+        <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Alias</th>
+                  <th>Permissions</th>
+                  <?if(auth::check("modify_member")):?>
+                  <th class="align-right">Tools</th>
+                  <?endif;?>
+                </tr>
+              </thead>
+              <tbody>
+                <?foreach($invitees as $user):?>
+                <tr>
+                    <td>
+                        <strong><?=$user->name;?></strong>
+                    </td>
+                    <td>
+                        <?foreach($permissions as $count => $permission):?>
+                        <span title="<?=$permission->name;?>" class="glyphicon glyphicon-<?=$permission->icon;?><?if(!in_array($permission->id, $user->permissions)):?> glyphicon-disabled<?endif;?>"></span>
+                        <?endforeach;?>
+                    </td>
+                    <?if(auth::check("modify_member")):?>
+                    <td class="align-right">
+                    <div class="btn-group">
+                        <?if(auth::check("remove_member")):?>
+                        <a href="<?=router::URL("/*id/members/remove-invitee/{$user->id}");?>" class="btn btn-xs btn-default" onclick="javascript:return confirm('Are you sure you want to remove <?=$user->name;?>?');"><span class="glyphicon glyphicon-trash"></span></a>
+                        <?endif;?>
+                    </div>
+                    </td>
+                    <?endif;?>
+                </tr>
+                <?endforeach;?>
+              </tbody>
+            </table>
+        </div>
+        <?else:?>
+        <blockquote>This project has no invitees.</blockquote>
+        <?endif;?>
+        <p>
+            <?if(auth::check("add_member")):?>
+            <a class="btn btn-lg btn-primary" href="<?=router::URL('/*id/members/add');?>" role="button">Invite a member »</a>
+            <?endif;?>
+        </p>

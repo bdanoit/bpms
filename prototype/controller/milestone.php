@@ -2,13 +2,6 @@
 class ControllerMilestone extends Controller
 {
 	public function __before(){
-	    if(auth::user()){
-	        _global()->projects = run()->manager->project->listByUser(auth::user()->id);
-	    }
-        $id = router::Current()->vars->id;
-        _global()->project = $this->project = run()->manager->project->findBy(array(
-            "id"=>$id
-        ));
         $this->view = view()->milestone;
         auth::defineAll(auth::EDIT);
 		auth::define(array(

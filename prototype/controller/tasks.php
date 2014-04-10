@@ -2,18 +2,6 @@
 class ControllerTasks extends Controller
 {
 	public function __before(){
-        //list of users current projects
-	    if(auth::user()){
-	        _global()->projects = run()->manager->project->listByUser(auth::user()->id);
-	    }
-        
-        //current defined router variables
-        $vars = router::Current()->vars;
-        
-        //find and store current project
-        _global()->project = $this->project = run()->manager->project->findBy(array(
-            "id"=>$vars->id
-        ));
         
         //define the directory of views
         $this->view = view()->tasks;

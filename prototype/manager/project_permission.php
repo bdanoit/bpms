@@ -11,10 +11,19 @@ class ManagerProjectPermission extends Manager{
         $project = run()->manager->project->findBy(array("id"=>$project_id));
         
         //if this is an insert, and user is already a member
-        if($insert && $this->findBy(array("user_id"=>$user->id,"project_id"=>$project_id))){
+        if($insert && run()->manager->projectPermission->findBy(array("user_id"=>$user->id,"project_id"=>$project_id))){
 			$GLOBALS["errors"][] = (object)array(
 				"code"=>dechex(0),
 				"message"=>"User ($user_name) is already a member of this project."
+			);
+            return false;
+        }
+        
+        //if this is an insert, and user is already invited
+        if($insert && run()->manager->projectInvite->findBy(array("user_id"=>$user->id,"project_id"=>$project_id))){
+			$GLOBALS["errors"][] = (object)array(
+				"code"=>dechex(0),
+				"message"=>"User ($user_name) is already invited."
 			);
             return false;
         }
@@ -88,7 +97,7 @@ class ManagerProjectPermission extends Manager{
         ));
     }
     
-	protected final function prepare(&$row){
+	protected function prepare(&$row){
         $row->user = function($row){ return run()->manager->user->findBy(array("id"=>$row->user_id)); };
         $row->permissions = function($row){ return run()->manager->permission->listByProjectMember($row->project_id, $row->user_id); };
 	}

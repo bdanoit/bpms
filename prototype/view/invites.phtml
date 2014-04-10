@@ -1,0 +1,43 @@
+<div class="jumbotron">
+        <h1>Invitations</h1>
+        <?if($projects):?>
+        <p class="lead">Here are the projects you have been invited to join.</p>
+        <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Action</th>
+                    <th>Created by</th>
+                    <th>Started on</th>
+                    <th>Permissions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?foreach($projects as $project):?>
+                <tr>
+                    <td>
+                        <strong><?=$project->name;?></strong>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <a href="/invite/<?=$project->id;?>/accept" class="btn btn-success btn-xs" title="Accept"><span class="glyphicon glyphicon-ok"></span></a>
+                            <a href="/invite/<?=$project->id;?>/decline" class="btn btn-danger btn-xs" title="Decline"><span class="glyphicon glyphicon-remove"></span></a>
+                        </div>
+                    </td>
+                    <td><?=$project->creator()->alias;?></td>
+                    <td><?=$project->started_on;?></td>
+                    <td>
+                        <?foreach($permissions as $count => $permission):?>
+                        <span title="<?=$permission->name;?>" class="glyphicon glyphicon-<?=$permission->icon;?><?if(!in_array($permission->id, $project->permissions)):?> glyphicon-disabled<?endif;?>"></span>
+                        <?endforeach;?>
+                    </td>
+                </tr>
+                <?endforeach;?>
+              </tbody>
+            </table>
+          </div>
+        <?else:?>
+        <p>You have no invitations.</p>
+        <?endif;?>
+      </div>

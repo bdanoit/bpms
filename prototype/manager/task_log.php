@@ -17,7 +17,21 @@ class ManagerTaskLog extends Manager{
     
     public final function insert($data){
         $this->sanitize($data);
-        return parent::insert($data);
+        try{
+            parent::insert($data);
+        }
+        catch(ManagerException $exc){
+            if($exc->getCode() == 1048){
+                $message = $this->fetch_single('SELECT get_last_custom_error() AS err', NULL, false);
+            }
+            $message = $message ? $message->err : $exc->getMessage();
+            $GLOBALS["errors"][] = (object)array(
+                "code"=>$exc->getCode(),
+                "message"=>$message
+            );
+            return false;
+        }
+        return true;
     }
     
     public final function update($data){

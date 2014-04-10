@@ -15,7 +15,7 @@ SQL;
     public final function search($string, $prepare = false){
         if(strlen($string) < 3) return false;
         $SQL = <<<SQL
-            SELECT name FROM
+            SELECT id,name FROM
                 $this->table
             WHERE
                 name LIKE :query
@@ -118,7 +118,7 @@ SQL;
         try{
             $hash = string::bhash_md5($params['name'].time().rand(1,1048576));
             $user_id = $this->DBH->lastInsertId();
-            run()->manager->user_verify->insert(array(
+            run()->manager->userVerify->insert(array(
                 "hash"=>$hash,
                 "user_id"=>$user_id
             ));

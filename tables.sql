@@ -16,7 +16,7 @@ CREATE TABLE user(
 
 CREATE TABLE `sessions` (
   `hash` varchar(32) NOT NULL,
-  `user_id` varchar(64) DEFAULT '',
+  `user_id` int not null references user(id) on delete cascade,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`hash`),
   INDEX (`user_id`),
@@ -67,6 +67,7 @@ CREATE TABLE task(
     end datetime not null,
     creator_id int references user(id),
     complete tinyint(1) not null default 0,
+    estimate int,
     index(start),
     index(end)
 )ENGINE=InnoDB CHARACTER SET=utf8;
@@ -105,6 +106,13 @@ INSERT INTO permission (name, icon) VALUES
     ('Grant', 'gift');
 
 CREATE TABLE project_permission(
+    project_id int references project(id) ON DELETE CASCADE,
+    user_id int references user(id) ON DELETE CASCADE,
+    permission_id int references permission(id),
+    UNIQUE(project_id,user_id,permission_id)
+)ENGINE=InnoDB CHARACTER SET=utf8;
+
+CREATE TABLE project_invite(
     project_id int references project(id) ON DELETE CASCADE,
     user_id int references user(id) ON DELETE CASCADE,
     permission_id int references permission(id),
@@ -280,7 +288,30 @@ BEGIN
 END;
 $$
 
+DROP TRIGGER IF EXISTS taskLogEndDateBeforeStart;
+DELIMITER $$
+CREATE TRIGGER taskLogEndDateBeforeStart
+   BEFORE INSERT ON task_log
+   FOR EACH ROW
+BEGIN
+   IF NEW.start > NEW.end THEN
+      CALL raise_application_error(1234, 'Cant start after end date', 'task_log', NEW.start);
+      CALL get_last_custom_error();
+   END IF;
+END$$
 
+DROP TRIGGER IF EXISTS taskLogEndDateBeforeStartUpdate;
+DELIMITER $$
+CREATE TRIGGER taskLogEndDateBeforeStartUpdate
+   BEFORE UPDATE ON task_log
+
+   FOR EACH ROW
+BEGIN
+   IF NEW.start > NEW.end THEN
+      CALL raise_application_error(1234, 'Cant start after end date', 'task_log', NEW.start);
+      CALL get_last_custom_error();
+   END IF;
+END$$
 
 /* VIEWS */
 DROP VIEW IF EXISTS userProject;

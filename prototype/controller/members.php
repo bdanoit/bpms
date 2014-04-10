@@ -2,13 +2,6 @@
 class ControllerMembers extends Controller
 {
 	public function __before(){
-	    if(auth::user()){
-	        _global()->projects = run()->manager->project->listByUser(auth::user()->id);
-	    }
-        $id = router::Current()->vars->id;
-        _global()->project = $this->project = run()->manager->project->findBy(array(
-            "id"=>$id
-        ));
         $this->view = view()->members;
         auth::defineAll(auth::GRANT);
 		auth::define(array(
@@ -19,12 +12,32 @@ class ControllerMembers extends Controller
     public function index($project_id, $action){
         _global()->title = "Members";
         $members = run()->manager->user->listByProject($project_id);
+        $invitees = run()->manager->projectInvite->listByProject($project_id);
         $permissions = run()->manager->permission->listAll();
         return $this->view->index(array(
 		    "project"=>$this->project,
             "members"=>$members,
+            "invitees"=>$invitees,
             "permissions"=>$permissions
 		));
+    }
+    
+    public function invitees($project_id, $action){
+        _global()->title = "Members";
+        $invitees = run()->manager->projectInvite->listByProject($project_id);
+        $permissions = run()->manager->permission->listAll();
+        return $this->view->invitees(array(
+		    "project"=>$this->project,
+            "invitees"=>$invitees,
+            "permissions"=>$permissions
+		));
+    }
+    
+    public function remove_invitee($project_id, $action, $user_id){
+        _global()->title = NULL;
+        if(run()->manager->projectInvite->decline($project_id, $user_id))
+            util::Redirect(router::URL('/*id/members/invitees'));
+        return view()->error(array("message"=>"Could not remove invitee..."));
     }
     
     public function stats($project_id, $action){
@@ -60,11 +73,11 @@ class ControllerMembers extends Controller
     }
     
     public function add($project_id, $action){
-        _global()->title = "Add a member";
+        _global()->title = "Invite a member";
         if($_POST){
             $data = (object)$_POST;
-            if(run()->manager->projectPermission->insert($this->project->id, $data->name, $data->permissions))
-                util::Redirect(router::URL("/*id/members"));
+            if(run()->manager->projectInvite->insert($this->project->id, $data->name, $data->permissions))
+                util::Redirect(router::URL("/*id/members/invitees"));
         }
         $permissions = run()->manager->permission->listAll();
         return $this->view->add(array(

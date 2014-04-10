@@ -147,7 +147,8 @@ var overview = {
         var first_day_s = result.first_day_s;
         var elapsed = end-start;
         var num_months = result.num_months;
-        var num_days = (result.num_days > 31) ? result.num_days : 31;
+        //var num_days = (result.num_days >= 31) ? result.num_days : 31;
+        var num_days = result.num_days;
         
         //pixel data
         var pxd = pxd ? pxd : 40; //pixels per day square
@@ -235,6 +236,35 @@ var overview = {
             var gradient = context.createLinearGradient(0,y_offset,0,y_offset+height);
             switch(true){
                 case task.complete == 1:
+                    gradient.addColorStop(0,"#224e22");
+                    gradient.addColorStop(1,"#449d44");
+                    break;
+                case task.is_late:
+                    gradient.addColorStop(0,"#641816");
+                    gradient.addColorStop(1,"#c9302c");
+                    break;
+                case task.is_due_soon:
+                    gradient.addColorStop(0,"#764b0f");
+                    gradient.addColorStop(1,"#ec971f");
+                    break;
+                default:
+                    gradient.addColorStop(0,"#18586a");
+                    gradient.addColorStop(1,"#31b0d5");
+            }
+            this.roundRect(context, x_offset, y_offset, width, height, 4);
+            context.fillStyle = gradient;
+            context.fill();
+            context.strokeStyle = '#ccc';
+            context.stroke();
+            
+            task_coords.push({x1:x_offset,y1:y_offset,x2:x_offset+width,y2:y_offset+height,task:task});
+            
+            context.save();
+            context.clip();
+            if(task.percent_complete){
+            var gradient = context.createLinearGradient(0,y_offset,0,y_offset+height);
+            switch(true){
+                case task.complete == 1:
                     gradient.addColorStop(0,"#5cb85c");
                     gradient.addColorStop(1,"#449d44");
                     break;
@@ -250,14 +280,10 @@ var overview = {
                     gradient.addColorStop(0,"#5bc0de");
                     gradient.addColorStop(1,"#31b0d5");
             }
-            this.roundRect(context, x_offset, y_offset, width, height, 4);
-            context.fillStyle = gradient;
-            context.fill();
-            
-            task_coords.push({x1:x_offset,y1:y_offset,x2:x_offset+width,y2:y_offset+height,task:task});
-            
-            context.save();
-            context.clip();
+                this.roundRect(context, x_offset, y_offset, width * (task.percent_complete/100), height, 4, 1, false);
+                context.fillStyle = gradient;
+                context.fill();
+            }
             context.textAlign = 'left';
             var gradient = context.createLinearGradient(x_offset,0,x_offset+width,0);
             gradient.addColorStop(.55,"rgba(255,255,255,1)");

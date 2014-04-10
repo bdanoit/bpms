@@ -12,6 +12,32 @@ SQL;
         return $this->fetch_many($SQL);
     }
     
+    public final function insert(array $data, $prepare = true){
+        $obj = (object)$data;
+        unset($data['members']);
+        
+        $this->DBH->beginTransaction();
+        try{
+            parent::insert($data);
+            $id = $this->DBH->lastInsertId();
+            if($obj->members){
+                $members = explode(',', $obj->members);
+                run()->manager->projectInvite->insertMany($id, $members);
+            }
+        }
+        catch(ManagerException $exc){
+            $GLOBALS["errors"][] = (object)array(
+                "code"=>$exc->getCode(),
+                "message"=>$exc->getMessage()
+            );
+            $this->DBH->rollback();
+            return false;
+        }
+        
+        $this->DBH->commit();
+        return $id;
+    }
+    
 	protected final function prepare(&$row){
 		$row->started_on = date('F d, Y', strtotime($row->created));
         $row->name = strtoupper($row->name);

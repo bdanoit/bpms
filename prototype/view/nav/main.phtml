@@ -15,9 +15,9 @@
           <ul class="nav navbar-nav navbar-left">
             <li<?if($vars->action == "new-project"):?> class="active"<?endif;?>><a href="/new-project">New project</a></li>
             <li<?if($vars->action == "settings"):?> class="active"<?endif;?>><a href="/settings">Settings</a></li>
+            <?if($global->projects):?>
             <li class="<?if($vars->action == "projects" || $route->template == "dashboard"):?>active <?endif;?>dropdown">
                 <a href="/projects" class="dropdown-toggle" data-toggle="dropdown">Projects <b class="caret"></b></a>
-                <?if($global->projects):?>
                 <ul class="dropdown-menu">
                     <?foreach($global->projects as $project):?>
                     <li><a href="/project/<?=$project->id;?>"><?=$project->name;?></a></li>
@@ -25,8 +25,11 @@
                     <li class="divider"></li>
                     <li><a href="/projects">All projects</a></li>
                 </ul>
-                <?endif;?>
             </li>
+            <?endif;?>
+            <?if($global->invites):?>
+            <li<?if($vars->action == "new-project"):?> class="active"<?endif;?>><a href="/invites">Invites <span class="label label-primary"><?=$global->invites;?></span></a></li>
+            <?endif;?>
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li class="navbar-text"><small>Logged in as <em><?=$user->alias;?></em></small></li>

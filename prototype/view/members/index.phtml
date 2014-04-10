@@ -41,12 +41,12 @@
                 <?endforeach;?>
               </tbody>
             </table>
-          </div>
+        </div>
         <?else:?>
-        <p>This project has no members.</p>
+        <blockquote>This project has no members.</blockquote>
         <?endif;?>
         <p>
             <?if(auth::check("add_member")):?>
-            <a class="btn btn-lg btn-primary" href="<?=router::URL('/*id/members/add');?>" role="button">Add a member »</a>
+            <a class="btn btn-lg btn-primary" href="<?=router::URL('/*id/members/add');?>" role="button">Invite a member »</a>
             <?endif;?>
         </p>

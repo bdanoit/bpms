@@ -17,8 +17,9 @@ class ManagerTask extends Manager{
         $start = date('Y-m-d H:i:s', $start);
         $end = date('Y-m-d H:i:s', $end);
         $SQL = <<<SQL
-        SELECT * FROM
-            $this->table
+        SELECT t.*,l.time_logged FROM
+            $this->table t
+            LEFT JOIN (SELECT SUM(TIMESTAMPDIFF(SECOND, start, end)) AS time_logged, task_id FROM task_log WHERE project_id = $project_id GROUP BY task_id) l ON t.id = l.task_id
         WHERE project_id = $project_id 
         AND (start >= '$start' OR end >= '$start') 
         AND end <= '$end' 
@@ -70,16 +71,30 @@ SQL;
         return $this->fetch_many($SQL);
     }
     
+    protected function clean_data(array &$data){
+        $obj = (object)$data;
+        //clean up data
+        unset($data["assigned_to"], $data["start_date"], $data["start_time"], $data["end_date"], $data["end_time"]);
+        $data['start'] = date('Y-m-d H:i:s', strtotime("$obj->start_date $obj->start_time"));
+        $data['end'] = date('Y-m-d H:i:s', strtotime("$obj->end_date $obj->end_time"));
+        $est = $data['estimate'];
+        if(is_array($est)){
+            $minute = 60;
+            $hour = $minute * $minute;
+            $day = $hour * 24;
+            $data['estimate'] =
+                (int)$est[0] * $day + 
+                (int)$est[1] * $hour + 
+                (int)$est[2] * $minute;
+        }
+    }
+    
     /**
     * Insert task and assignees (Query 4b)
     **/
     public final function insert(array $data){
         $obj = (object)$data;
-        
-        //clean up data
-        unset($data["assigned_to"], $data["start_date"], $data["start_time"], $data["end_date"], $data["end_time"]);
-        $data['start'] = date('Y-m-d H:i:s', strtotime("$obj->start_date $obj->start_time"));
-        $data['end'] = date('Y-m-d H:i:s', strtotime("$obj->end_date $obj->end_time"));
+        $this->clean_data($data);
         
         //start transaction
         $this->DBH->beginTransaction();
@@ -111,11 +126,7 @@ SQL;
     **/
     public final function update(array $data){
         $obj = (object)$data;
-        
-        //clean up data
-        unset($data["assigned_to"], $data["start_date"], $data["start_time"], $data["end_date"], $data["end_time"]);
-        $data['start'] = date('Y-m-d H:i:s', strtotime("$obj->start_date $obj->start_time"));
-        $data['end'] = date('Y-m-d H:i:s', strtotime("$obj->end_date $obj->end_time"));
+        $this->clean_data($data);
         
         //start transaction
         $this->DBH->beginTransaction();
@@ -243,6 +254,30 @@ SQL;
             if($now > $end) $row->is_late = true;
             $day = self::day;
             if(($end/$day - $now/$day) < 3) $row->is_due_soon = true;
+        }
+        if($row->estimate){
+            $est = (int)$row->estimate;
+            if($row->time_logged && !$row->complete){
+                if($row->time_logged > $row->estimate){
+                    $row->percent_complete = 100;
+                }
+                $row->percent_complete = round($row->time_logged / $row->estimate * 100);
+            }
+            $minute = 60;
+            $hour = $minute * $minute;
+            $day = $hour * 24;
+            //set up variables
+            $days = round($est / $day);
+            $hours = round($est % $day / $hour);
+            $minutes = round($est % $hour / $minute);
+            $row->estimate = array(
+                $days,
+                $hours,
+                $minutes
+            );
+        }
+        if($row->complete == 1){
+            $row->percent_complete = 100;
         }
 	}
     

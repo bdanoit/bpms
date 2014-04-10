@@ -27,6 +27,10 @@ a.navbar-brand:hover{
     overflow: hidden;
     width: 136px;
 }*/
+span.badge-info{
+    background-color: #d9534f;
+    color: #fff;
+}
 
 .form-settings .form-control,
 .form-signin .form-control{

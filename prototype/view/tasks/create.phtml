@@ -45,6 +45,15 @@
     <textarea name="description" id="task_description" class="form-control" placeholder="Description" rows="5"><?=$task->description;?></textarea>
 </div>
 <div class="form-group">
+    <label for="task_estimate">Estimated completion time</label>
+    <div class="form-inline">
+        days <input type="number" name="estimate[0]" min="0" id="task_estimate" class="number form-control" size="1" value="<?=$task->estimate[0]?$task->estimate[0]:'0';?>">
+        hours <input type="number" name="estimate[1]" min="0" max="23" id="task_estimate" class="number form-control" size="1" value="<?=$task->estimate[1]?$task->estimate[1]:'0';?>">
+        minutes <input type="number" name="estimate[2]" min="0" max="59" id="task_estimate" class="number form-control" size="1" value="<?=$task->estimate[2]?$task->estimate[2]:'0';?>">
+    </div>
+        
+</div>
+<div class="form-group">
       <div class="checkbox">
           <label>
               <input type="hidden" value="0" name="complete">

@@ -2,9 +2,6 @@
 class ControllerDefault extends Controller
 {
 	public function __before(){
-	    if(auth::user()){
-	        _global()->projects = run()->manager->project->listByUser(auth::user()->id);
-	    }
 		auth::define(array(
 			"projects"=>auth::USER,
 			"settings"=>auth::USER,
@@ -49,11 +46,31 @@ class ControllerDefault extends Controller
     
     public function projects(){
         _global()->title = "Projects";
-        $projects = run()->manager->project->listByUser(auth::user()->id);
+        $projects = run()->manager->project->listByUser($this->user->id);
 		return view()->projects(array(
-		    "user"=>auth::user(),
+		    "user"=>$this->user,
             "projects"=>$projects
 		));
+    }
+    
+    public function invites(){
+        _global()->title = "Projects";
+        $projects = run()->manager->projectInvite->listByUser($this->user->id);
+        $permissions = run()->manager->permission->listAll();
+		return view()->invites(array(
+		    "user"=>auth::user(),
+            "projects"=>$projects,
+            "permissions"=>$permissions
+		));
+    }
+    
+    public function invite($action, $project_id, $type){
+        $project = run()->manager->project->findBy(array("project_id"=>$project_id));
+        if($type == 'accept' || $type == 'decline'){
+            if(run()->manager->projectInvite->{$type}($project_id, $this->user->id))
+                util::Redirect(router::URL('/invites', 'default'));
+        }
+        return view()->error(array("message"=>"Could not $type invite..."));
     }
     
     public function new_project($action){
@@ -62,13 +79,21 @@ class ControllerDefault extends Controller
             $data = $_POST;
             $data['creator_id'] = auth::user()->id;
             $data['created'] = date('Y-m-d H:i:s');
-            if(run()->manager->project->insert($data)){
-                util::Redirect(router::URL('/projects'));
+            if($id = run()->manager->project->insert($data)){
+                util::Redirect(router::URL("/project/$id/members/invitees"));
             }
         }
 		return view()->new_project(array(
 		    "user"=>auth::user()
 		));
+    }
+    
+    public function users_json($project_id, $action){
+        $this->template = "blank";
+        $query = $_GET['q'];
+        return view()->members->json(array(
+            "members"=>run()->manager->user->search($query)
+        ));
     }
     
     public function contact(){

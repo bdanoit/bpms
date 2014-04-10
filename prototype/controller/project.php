@@ -2,19 +2,6 @@
 class ControllerProject extends Controller
 {
 	public function __before(){
-        # list of users current projects
-	    if(auth::user()){
-	        _global()->projects = run()->manager->project->listByUser(auth::user()->id);
-	    }
-        
-        # current defined router variables
-        $vars = router::Current()->vars;
-        
-        # find and store current project
-        _global()->project = $this->project = run()->manager->project->findBy(array(
-            "id"=>$vars->id
-        ));
-        
         # define the directory of views
         $this->view = view()->project;
         
@@ -73,6 +60,11 @@ class ControllerProject extends Controller
 		));
     }
     
+    /**
+     * Loads an index of tasks for current project
+     *
+     * Returns a json object
+     */
     public function index_json($project_id, $action){
         $this->template = 'blank';
         header('Content-type: application/json');
@@ -113,9 +105,14 @@ class ControllerProject extends Controller
             elseif($task->end > $end) $end = $task->end;
         }
         
+        $month = 28;
         $day = 86400;
         $start = strtotime(date('m/d/Y', $start));
         $end = strtotime(date('m/d/Y', $end + $day));
+        $one_month = $start + $month * $day;
+        if($one_month > $end){
+            $end = $one_month;
+        }
         $temp_ts = $start;
         $num_months = 0;
         $num_days = ceil(($end-$start) / $day);
