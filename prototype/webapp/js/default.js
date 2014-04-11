@@ -121,6 +121,7 @@ var overview = {
         canvas.attr('height', 0);
         heading.attr('width', 0);
         heading.attr('height', 0);
+        this.wrapper.find('.no-tasks').remove();
         this.wrapper.prepend('<blockquote class="no-tasks alert-danger">No tasks found</blockquote>');
         this.wrapper.find('canvas').hide();
     },

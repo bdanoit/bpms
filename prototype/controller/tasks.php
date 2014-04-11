@@ -80,7 +80,7 @@ class ControllerTasks extends Controller
     
     public function view($project_id, $action, $task_id){
         $task = run()->manager->task->findBy(array("id"=>$task_id,"project_id"=>$project_id));
-        $log = run()->manager->taskLog->listBy(array("project_id"=>$project_id,"task_id"=>$task_id,"user_id"=>auth::user()->id));
+        $log = run()->manager->taskLog->listBy(array("project_id"=>$project_id,"task_id"=>$task_id));
         
         _global()->title = $task->name;
         _global()->breadcrumb[_global()->title] = $action;

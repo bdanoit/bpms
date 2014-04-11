@@ -96,7 +96,7 @@ class ControllerProject extends Controller
         if($data->id != 'all' && $curr_ms){
             $tasks = run()->manager->task->listByProjectMilestone($project_id, $curr_ms->start, $curr_ms->end, $complete);
         }
-        else $tasks = run()->manager->task->listBy(array("project_id"=>$project_id,"complete"=>$complete));
+        else $tasks = run()->manager->task->listByProjectMilestone($project_id, $bounds->start, $bounds->end, $complete);
         foreach($tasks as $task){
             $task->collaborators = $task->assigned_to();
             if(!$start) $start = $task->start;
